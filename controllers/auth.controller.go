@@ -49,6 +49,7 @@ func CheckPasswordStrength(s string) bool {
 }
 
 func Register(c *gin.Context) {
+	// TODO email confirmation
 	var input RegisterInput
 
 	if err := c.ShouldBind(&input); err != nil {
@@ -66,10 +67,15 @@ func Register(c *gin.Context) {
 	user.HashPassword()
 
 	if err := database.DB.Create(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		utils.SendRegistrationMail("Account Alert", "Someone attempted to create an account using your email. If this was you, try applying for password reset in case you have lost access to your account.", user.Email, user.ID, user.Name, false)
+		c.JSON(http.StatusCreated, gin.H{"message": "User created. Verification email sent!"})
+		// c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		// we lie!
+		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "User created"})
+	utils.SendRegistrationMail("Account Verification.", "Please visit the following link to verify your account: ", user.Email, user.ID, user.Name, true)
+	c.JSON(http.StatusCreated, gin.H{"message": "User created. Verification email sent!"})
 }
 
 func VerifyPassword(password, hashedPassword string) error {
@@ -115,6 +121,11 @@ func Login(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "The email or password is not correct"})
+		return
+	}
+
+	if !user.Verified {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Please verify your email first."})
 		return
 	}
 

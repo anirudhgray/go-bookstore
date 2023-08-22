@@ -21,6 +21,7 @@ type User struct {
 	Password     string `gorm:"size:255;not null;"` // TODO password strength checks
 	Name         string `gorm:"size:255;not null;"`
 	Role         UserRole
+	Verified     bool
 	ShoppingCart ShoppingCart `gorm:"foreignKey:UserID;"` // one to one
 	UserLibrary  UserLibrary  `gorm:"foreignKey:UserID;"`
 	UserReviews  []Review     `gorm:"foreignKey:UserID;"` // one to many
@@ -33,6 +34,7 @@ func (user *User) Associate() error {
 	user.Role = BaseUser
 	user.ShoppingCart = ShoppingCart{UserID: user.ID}
 	user.UserLibrary = UserLibrary{UserID: user.ID}
+	user.Verified = false
 
 	return nil
 }
