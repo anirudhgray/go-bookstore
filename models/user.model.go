@@ -18,7 +18,7 @@ const (
 type User struct {
 	gorm.Model
 	Email        string `gorm:"size:255;not null;unique;"`
-	Password     string `gorm:"size:255;not null;"`
+	Password     string `gorm:"size:255;not null;"` // TODO password strength checks
 	Name         string `gorm:"size:255;not null;"`
 	Role         UserRole
 	ShoppingCart ShoppingCart `gorm:"foreignKey:UserID;"` // one to one
@@ -45,8 +45,4 @@ func (user *User) HashPassword() error {
 	}
 	user.Password = string(hashedPassword)
 	return nil
-}
-
-func VerifyPassword(password, hashedPassword string) error {
-	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }

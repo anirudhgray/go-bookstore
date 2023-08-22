@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/anirudhgray/balkan-assignment/controllers"
+	"github.com/anirudhgray/balkan-assignment/routers/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -28,6 +29,12 @@ func RegisterRoutes(route *gin.Engine) {
 	{
 		auth.POST("/register", controllers.Register)
 		auth.POST("/login", controllers.Login)
+	}
+
+	protected := v1.Group("/protected")
+	{
+		protected.Use(middleware.AdminAuthMiddleware())
+		protected.GET("/", controllers.GetData)
 	}
 
 	//Add All route

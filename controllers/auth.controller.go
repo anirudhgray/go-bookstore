@@ -40,6 +40,10 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "User created"})
 }
 
+func VerifyPassword(password, hashedPassword string) error {
+	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
+}
+
 func LoginCheck(email, password string) (string, models.User, error) {
 	var err error
 
@@ -49,7 +53,7 @@ func LoginCheck(email, password string) (string, models.User, error) {
 		return "", user, err
 	}
 
-	err = models.VerifyPassword(password, user.Password)
+	err = VerifyPassword(password, user.Password)
 
 	if err != nil && err == bcrypt.ErrMismatchedHashAndPassword {
 		return "", user, err
