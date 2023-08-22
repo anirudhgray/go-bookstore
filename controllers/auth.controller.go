@@ -5,6 +5,7 @@ import (
 	"unicode"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
+	"github.com/anirudhgray/balkan-assignment/infra/logger"
 	"github.com/anirudhgray/balkan-assignment/models"
 	"github.com/anirudhgray/balkan-assignment/utils"
 	"github.com/gin-gonic/gin"
@@ -130,4 +131,26 @@ func Login(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": token, "user": user})
+}
+
+func VerifyEmail(c *gin.Context) {
+	email := c.Query("email")
+	otp := c.Query("otp")
+	var entry models.VerificationEntry
+	if result := database.DB.Where("email = ?", email).First(&entry); result.Error != nil {
+		logger.Errorf("Error while verifying: %v", result.Error)
+	}
+	if entry.OTP == otp {
+		var user models.User
+		database.DB.Where("email = ?", email).First(&user)
+		user.Verified = true
+		if result := database.DB.Save(&user); result.Error != nil {
+			logger.Errorf("Error while verifying: %v", result.Error)
+			return
+		}
+		database.DB.Where("email = ?", email).Delete(&models.VerificationEntry{})
+		c.JSON(http.StatusOK, gin.H{"message": "Verified! You can now log in."})
+		return
+	}
+	c.JSON(http.StatusForbidden, gin.H{"error": "Invalid verification."})
 }

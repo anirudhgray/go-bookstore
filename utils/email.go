@@ -9,7 +9,9 @@ import (
 	"math/big"
 	"net/http"
 
+	"github.com/anirudhgray/balkan-assignment/infra/database"
 	"github.com/anirudhgray/balkan-assignment/infra/logger"
+	"github.com/anirudhgray/balkan-assignment/models"
 	"github.com/spf13/viper"
 )
 
@@ -38,9 +40,11 @@ type RegistrationEmail struct {
 }
 
 func SendRegistrationMail(subject string, content string, toEmail string, userID uint, userName string, newUser bool) {
+	otp := ""
 	if newUser {
-		otp := GenerateOTP(6)
+		otp = GenerateOTP(6)
 		content += "http://0.0.0.0:8000/v1/auth/verify?email=" + toEmail + "&otp=" + otp
+
 	}
 	url := "https://send.api.mailtrap.io/api/send"
 	method := "POST"
@@ -85,4 +89,12 @@ func SendRegistrationMail(subject string, content string, toEmail string, userID
 		return
 	}
 	defer res.Body.Close()
+
+	if newUser {
+		entry := models.VerificationEntry{
+			Email: toEmail,
+			OTP:   otp,
+		}
+		database.DB.Create(&entry)
+	}
 }

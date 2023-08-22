@@ -29,6 +29,7 @@ func RegisterRoutes(route *gin.Engine) {
 	{
 		auth.POST("/register", controllers.Register)
 		auth.POST("/login", controllers.Login)
+		auth.GET("/verify", controllers.VerifyEmail)
 	}
 
 	protected := v1.Group("/protected")
