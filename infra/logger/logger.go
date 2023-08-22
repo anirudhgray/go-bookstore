@@ -2,9 +2,13 @@ package logger
 
 import (
 	"bytes"
-	"github.com/sirupsen/logrus"
+	"io"
+	"os"
 	"strings"
 	"time"
+
+	"github.com/sirupsen/logrus"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 var logger = logrus.New()
@@ -13,6 +17,14 @@ func init() {
 	logger.Level = logrus.InfoLevel
 	logger.Formatter = &formatter{}
 
+	multiWriter := io.MultiWriter(os.Stdout, &lumberjack.Logger{
+		Filename:   "app.log", // Path to the log file
+		MaxSize:    50,        // Max size in megabytes before rotation
+		MaxBackups: 3,         // Number of log files to keep
+		MaxAge:     30,        // Days to keep log files
+	})
+
+	logger.SetOutput(multiWriter)
 	logger.SetReportCaller(true)
 }
 
