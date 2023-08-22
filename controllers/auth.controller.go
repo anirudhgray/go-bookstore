@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"unicode"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
 	"github.com/anirudhgray/balkan-assignment/models"
@@ -21,11 +22,42 @@ type LoginInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+func CheckPasswordStrength(s string) bool {
+	var (
+		hasMinLen  = false
+		hasUpper   = false
+		hasLower   = false
+		hasNumber  = false
+		hasSpecial = false
+	)
+	if len(s) >= 7 {
+		hasMinLen = true
+	}
+	for _, char := range s {
+		switch {
+		case unicode.IsUpper(char):
+			hasUpper = true
+		case unicode.IsLower(char):
+			hasLower = true
+		case unicode.IsNumber(char):
+			hasNumber = true
+		case unicode.IsPunct(char) || unicode.IsSymbol(char):
+			hasSpecial = true
+		}
+	}
+	return hasMinLen && hasUpper && hasLower && hasNumber && hasSpecial
+}
+
 func Register(c *gin.Context) {
 	var input RegisterInput
 
 	if err := c.ShouldBind(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if !CheckPasswordStrength(input.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password not strong enough."})
 		return
 	}
 

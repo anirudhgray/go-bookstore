@@ -31,7 +31,6 @@ func GenerateToken(user models.User) (string, error) {
 
 }
 
-// TODO auth middleware for routes
 func getTokenFromRequest(c *gin.Context) string {
 	bearerToken := c.Request.Header.Get("Authorization")
 
