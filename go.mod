@@ -6,6 +6,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/sirupsen/logrus v1.9.3
 	github.com/spf13/viper v1.16.0
+	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.4
 	gorm.io/plugin/dbresolver v1.4.7
