@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// RegisterRoutes add all routing list here automatically get main router
 func RegisterRoutes(route *gin.Engine) {
 	route.NoRoute(func(ctx *gin.Context) {
 		ctx.JSON(http.StatusNotFound, gin.H{"status": http.StatusNotFound, "message": "Route Not Found"})
@@ -32,10 +31,12 @@ func RegisterRoutes(route *gin.Engine) {
 		auth.GET("/verify", controllers.VerifyEmail)
 	}
 
-	protected := v1.Group("/protected")
+	admin := v1.Group("/admin")
 	{
-		protected.Use(middleware.AdminAuthMiddleware())
-		protected.GET("/", controllers.GetData)
+		admin.Use(middleware.AdminAuthMiddleware())
+		admin.GET("/", controllers.GetData) // TODO implement some sort of admin dashboard statistics thing here?
+		admin.POST("/books", controllers.CreateBook)
+		admin.PATCH("/books/:id", controllers.EditBook)
 	}
 
 	//Add All route

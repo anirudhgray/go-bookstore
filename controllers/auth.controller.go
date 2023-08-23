@@ -78,6 +78,7 @@ func Login(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"token": token, "user": user})
 }
 
+// VerifyEmail takes your email and otp sent of registration to verify a user account.
 func VerifyEmail(c *gin.Context) {
 	email := c.Query("email")
 	otp := c.Query("otp")

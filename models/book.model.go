@@ -19,13 +19,15 @@ const (
 
 type Book struct {
 	gorm.Model
-	Name          string         `gorm:"not null;"`
-	Author        string         `gorm:"not null"` // TODO FK to Author
-	Publisher     string         `gorm:"not null"` // TODO FK to Publisher
-	Year          time.Time      `gorm:"not null"`
-	Price         int64          `gorm:"not null"`
-	ISBN          string         `gorm:"size:255;not null"`
-	Category      BookCategory   `gorm:"not null"`
-	ShoppingCarts []ShoppingCart `gorm:"many2many:cart_books;"` // TODO for a "In X carts currently!" feature
-	Reviews       []Review       `gorm:"foreignKey:BookID;not null"`
+	Name          string    `gorm:"not null;"`
+	Author        string    `gorm:"not null"` // TODO FK to Author
+	Publisher     string    `gorm:"not null"` // TODO FK to Publisher
+	Date          time.Time `gorm:"not null"`
+	Year          time.Time
+	Price         int64           `gorm:"not null"`
+	ISBN          string          `gorm:"size:255;not null"`
+	Category      BookCategory    `gorm:"not null"`
+	ShoppingCarts []*ShoppingCart `gorm:"many2many:cart_books;"` // TODO for a "In X carts currently!" feature
+	UserLibraries []*UserLibrary  `gorm:"many2many:user_library_books;"`
+	Reviews       []Review        `gorm:"foreignKey:BookID;not null"`
 }
