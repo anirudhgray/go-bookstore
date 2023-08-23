@@ -98,3 +98,13 @@ func EditBook(c *gin.Context) {
 }
 
 // TODO add admin user functions such as deleting users, seeing statistics for how many users, how many deactivated, how many comments etc.
+
+func GetAllTransactions(c *gin.Context) {
+	var transactions []models.Transaction
+	if err := database.DB.Preload("Books").Find(&transactions).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch all transactions for admin"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"transactions": transactions})
+}
