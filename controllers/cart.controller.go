@@ -10,7 +10,6 @@ import (
 )
 
 func AddBookToCart(c *gin.Context) {
-	// TODO protect against adding purchases books to cart/ buying already purchased books
 	user, _ := c.Get("user")
 	currentUser := user.(*models.User)
 
@@ -32,6 +31,21 @@ func AddBookToCart(c *gin.Context) {
 	for _, cartBook := range cart.Books {
 		if cartBook.ID == book.ID {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Book is already in the cart"})
+			return
+		}
+	}
+
+	var library models.UserLibrary
+	if err := database.DB.Model(&library).Preload("Books").First(&library, "user_id = ?", currentUser.ID).Error; err != nil {
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user library"})
+		return
+	}
+
+	// check if book in purchased library already
+	for _, libraryBook := range library.Books {
+		if libraryBook.ID == book.ID {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Book is already purchased and in user library"})
 			return
 		}
 	}

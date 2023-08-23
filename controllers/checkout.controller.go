@@ -9,6 +9,7 @@ import (
 )
 
 func Checkout(c *gin.Context) {
+	// TODO simulate failed transaction
 	currentUser := c.MustGet("user").(*models.User)
 
 	var cart models.ShoppingCart
