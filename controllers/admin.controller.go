@@ -97,4 +97,4 @@ func EditBook(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Book updated successfully", "book": book})
 }
 
-// TODO add user functions such as deleting users, seeing statistics for how many users, how many deactivated, how many comments etc.
+// TODO add admin user functions such as deleting users, seeing statistics for how many users, how many deactivated, how many comments etc.

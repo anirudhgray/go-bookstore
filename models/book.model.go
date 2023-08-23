@@ -28,7 +28,7 @@ type Book struct {
 	FilePath      string
 	ISBN          string          `gorm:"size:255;not null"`
 	Category      BookCategory    `gorm:"not null"`
-	ShoppingCarts []*ShoppingCart `gorm:"many2many:cart_books;"` // TODO for a "In X carts currently!" feature
+	ShoppingCarts []*ShoppingCart `gorm:"many2many:cart_books;"`
 	UserLibraries []*UserLibrary  `gorm:"many2many:user_library_books;"`
 	Reviews       []Review        `gorm:"foreignKey:BookID;not null"`
 }
