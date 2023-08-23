@@ -34,7 +34,7 @@ func RegisterRoutes(route *gin.Engine) {
 	admin := v1.Group("/admin")
 	{
 		admin.Use(middleware.AdminAuthMiddleware())
-		admin.GET("/", controllers.GetData) // TODO implement some sort of admin dashboard statistics thing here?
+		// admin.GET("/", controllers.GetData) // implement some sort of admin dashboard statistics thing here?
 		admin.POST("/books", controllers.CreateBook)
 		admin.PATCH("/books/:id", controllers.EditBook)
 		admin.GET("/transactions", controllers.GetAllTransactions)
@@ -47,6 +47,7 @@ func RegisterRoutes(route *gin.Engine) {
 		books.Use(middleware.BaseAuthMiddleware())
 		books.GET("/catalog", controllers.GetBooks)
 		books.GET("/catalog/:bookID", controllers.GetBook)
+		books.GET("/catalog/:bookID/download", controllers.DownloadBook)
 		books.POST("/cart/add/:bookID", controllers.AddBookToCart)
 		books.POST("/cart/remove/:bookID", controllers.RemoveFromCart)
 		books.GET("/cart", controllers.GetCart)
@@ -66,7 +67,4 @@ func RegisterRoutes(route *gin.Engine) {
 		user.GET("/transactions", controllers.GetUserTransactions)
 		user.GET("/library", controllers.GetUserLibrary)
 	}
-
-	//Add All route
-	//TestRoutes(route)
 }

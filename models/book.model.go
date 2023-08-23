@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-type BookCategory string // TODO book category model so admins can add categories
+type BookCategory string
 
 const (
 	Fantasy  BookCategory = "fantasy"
@@ -21,8 +21,8 @@ const (
 type Book struct {
 	gorm.Model
 	Name          string    `gorm:"not null;"`
-	Author        string    `gorm:"not null"` // TODO FK to Author
-	Publisher     string    `gorm:"not null"` // TODO FK to Publisher
+	Author        string    `gorm:"not null"`
+	Publisher     string    `gorm:"not null"`
 	Date          time.Time `gorm:"not null"`
 	Year          time.Time
 	Price         int64 `gorm:"not null"`

@@ -97,8 +97,6 @@ func EditBook(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Book updated successfully", "book": book})
 }
 
-// TODO add admin user functions such as deleting users, seeing statistics for how many users, how many deactivated, how many comments etc.
-
 // gets all shopping cart transactions done
 func GetAllTransactions(c *gin.Context) {
 	var transactions []models.Transaction
@@ -144,3 +142,5 @@ func DeleteBook(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Book deleted successfully"})
 }
+
+// TODO implement user banning once user deactivation implmented

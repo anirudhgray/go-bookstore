@@ -43,7 +43,7 @@ func GetBooks(c *gin.Context) {
 	// Search by name, author, or category
 	searchQuery := c.DefaultQuery("search", "")
 	if searchQuery != "" {
-		searchQuery = strings.ToLower(searchQuery) // Convert search query to lowercase
+		searchQuery = strings.ToLower(searchQuery)
 		query = query.Where("LOWER(name) LIKE ? OR LOWER(author) LIKE ? OR LOWER(category) LIKE ?", "%"+searchQuery+"%", "%"+searchQuery+"%", "%"+searchQuery+"%")
 	}
 
@@ -98,7 +98,32 @@ func GetBook(c *gin.Context) {
 	}
 
 	// Calculate average rating for the book
-	book.CalculateAvgRating() // Assuming this method calculates the average rating
+	book.CalculateAvgRating()
 
 	c.JSON(http.StatusOK, gin.H{"book": bookWithAvgRating})
+}
+
+func DownloadBook(c *gin.Context) {
+	bookID := c.Param("bookID")
+
+	var book models.Book
+	if err := database.DB.First(&book, bookID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
+		return
+	}
+
+	currentUser, _ := c.Get("user")
+
+	user := currentUser.(*models.User)
+	if !user.HasBookInLibrary(book.ID) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You do not have access to this book"})
+		return
+	}
+
+	// Send the file using c.File()
+	if book.FilePath == "" {
+		c.JSON(http.StatusNotFound, gin.H{"error": "No pdf found. Contact support."})
+		return
+	}
+	c.File(book.FilePath)
 }
