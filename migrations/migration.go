@@ -14,6 +14,7 @@ func Migrate() {
 		&models.UserLibrary{},
 		&models.Review{},
 		&models.VerificationEntry{},
+		&models.Transaction{},
 	}
 	err := database.DB.AutoMigrate(migrationModels...)
 	if err != nil {

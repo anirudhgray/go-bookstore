@@ -10,6 +10,7 @@ import (
 )
 
 func AddBookToCart(c *gin.Context) {
+	// TODO protect against adding purchases books to cart/ buying already purchased books
 	user, _ := c.Get("user")
 	currentUser := user.(*models.User)
 
