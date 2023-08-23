@@ -82,3 +82,23 @@ func GetBooks(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"books": booksWithAvgRating})
 }
+
+func GetBook(c *gin.Context) {
+	var book models.Book
+	bookID := c.Param("bookID")
+
+	if err := database.DB.Preload("Reviews").First(&book, bookID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
+		return
+	}
+
+	bookWithAvgRating := BookWithAvgRating{
+		Book:      book,
+		AvgRating: book.CalculateAvgRating(),
+	}
+
+	// Calculate average rating for the book
+	book.CalculateAvgRating() // Assuming this method calculates the average rating
+
+	c.JSON(http.StatusOK, gin.H{"book": bookWithAvgRating})
+}
