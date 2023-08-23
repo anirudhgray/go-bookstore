@@ -6,14 +6,14 @@ import (
 	"github.com/anirudhgray/balkan-assignment/infra/database"
 	"github.com/anirudhgray/balkan-assignment/infra/logger"
 	"github.com/anirudhgray/balkan-assignment/models"
-	"github.com/anirudhgray/balkan-assignment/utils"
+	"github.com/anirudhgray/balkan-assignment/utils/token"
 	"github.com/gin-gonic/gin"
 )
 
 func BaseAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
-		userID, err := utils.ValidateToken(c)
+		userID, err := token.ValidateToken(c)
 
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"Unauthorized": "Authentication required"})
@@ -41,7 +41,7 @@ func BaseAuthMiddleware() gin.HandlerFunc {
 func AdminAuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Validate the token and get user details
-		userID, err := utils.ValidateToken(c)
+		userID, err := token.ValidateToken(c)
 
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"Unauthorized": "Authentication required"})

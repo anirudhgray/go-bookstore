@@ -18,12 +18,12 @@ const (
 type User struct {
 	gorm.Model
 	Email        string `gorm:"size:255;not null;unique;"`
-	Password     string `gorm:"size:255;not null;"` // TODO password strength checks
+	Password     string `gorm:"size:255;not null;"`
 	Name         string `gorm:"size:255;not null;"`
 	Role         UserRole
 	Verified     bool
 	ShoppingCart ShoppingCart `gorm:"foreignKey:UserID;"` // one to one
-	UserLibrary  UserLibrary  `gorm:"foreignKey:UserID;"`
+	UserLibrary  UserLibrary  `gorm:"foreignKey:UserID;"` // one to one
 	UserReviews  []Review     `gorm:"foreignKey:UserID;"` // one to many
 	// TODO wishlists, one to many
 }

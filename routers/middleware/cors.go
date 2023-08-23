@@ -1,8 +1,9 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
 	"log"
+
+	"github.com/gin-gonic/gin"
 )
 
 func CORSMiddleware() gin.HandlerFunc {
@@ -17,7 +18,7 @@ func CORSMiddleware() gin.HandlerFunc {
 
 		if ctx.Request.Method == "OPTIONS" {
 			log.Println("OPTIONS")
-			ctx.AbortWithStatus(200)
+			ctx.AbortWithStatus(200) // indicating that options check was successful
 		} else {
 			ctx.Next()
 		}
