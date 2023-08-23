@@ -48,6 +48,7 @@ func RegisterRoutes(route *gin.Engine) {
 		books.POST("/cart/remove/:bookID", controllers.RemoveFromCart)
 		books.GET("/cart", controllers.GetCart)
 		books.POST("/attach", controllers.AttachCL)
+		books.POST("/review", controllers.AddReview)
 	}
 
 	checkout := v1.Group("/checkout")

@@ -61,3 +61,16 @@ func (user *User) HashPassword() error {
 	user.Password = string(hashedPassword)
 	return nil
 }
+
+func (u *User) HasBookInLibrary(bookID uint) bool {
+	if err := database.DB.Preload("Books").First(&u.UserLibrary, "user_id = ?", u.ID).Error; err != nil {
+		return false
+	}
+
+	for _, book := range u.UserLibrary.Books {
+		if book.ID == bookID {
+			return true
+		}
+	}
+	return false
+}

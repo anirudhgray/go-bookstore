@@ -11,6 +11,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+type BookWithAvgRating struct {
+	models.Book
+	AvgRating float64
+}
+
 // AttachCL is a helper for attaching cart/library/wishlist to old accounts
 func AttachCL(c *gin.Context) {
 	user, _ := c.Get("user")
@@ -59,10 +64,21 @@ func GetBooks(c *gin.Context) {
 	// Apply pagination
 	query = query.Offset(offset).Limit(pageSize)
 
-	if err := query.Find(&books).Error; err != nil {
+	if err := query.Preload("Reviews").Find(&books).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch books"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"books": books})
+	booksWithAvgRating := make([]BookWithAvgRating, 0)
+	for _, book := range books {
+		logger.Infof("%v %v", book.Name, book.CalculateAvgRating())
+
+		bookWithAvgRating := BookWithAvgRating{
+			Book:      book,
+			AvgRating: book.CalculateAvgRating(),
+		}
+		booksWithAvgRating = append(booksWithAvgRating, bookWithAvgRating)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"books": booksWithAvgRating})
 }
