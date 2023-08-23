@@ -45,6 +45,7 @@ func RegisterRoutes(route *gin.Engine) {
 		books.GET("/catalog", controllers.GetBooks)
 		books.POST("/cart/:bookID", controllers.AddBookToCart)
 		books.GET("/cart", controllers.GetCart)
+		books.POST("/attach", controllers.AttachCL)
 	}
 
 	//Add All route

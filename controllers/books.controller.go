@@ -12,6 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func AttachCL(c *gin.Context) {
+	user, _ := c.Get("user")
+	currentUser := user.(*models.User)
+	currentUser.AttachCartAndLibrary()
+	c.JSON(http.StatusOK, gin.H{"message": "cart and library attached"})
+}
+
 func GetBooks(c *gin.Context) {
 	var books []models.Book
 
@@ -78,12 +85,9 @@ func AddBookToCart(c *gin.Context) {
 	// Fetch the user's shopping cart
 	var cart models.ShoppingCart
 	if err := database.DB.Model(&cart).Preload("Books").First(&cart, "user_id = ?", currentUser.ID).Error; err != nil {
-		currentUser.AttachCartAndLibrary()
-		if err := database.DB.Model(&cart).Preload("Books").First(&cart, "user_id = ?", currentUser.ID).Error; err != nil {
-			fmt.Println(err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch shopping cart"})
-			return
-		}
+		fmt.Println(err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch shopping cart"})
+		return
 	}
 
 	for _, cartBook := range cart.Books {
