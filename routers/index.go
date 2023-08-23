@@ -55,6 +55,12 @@ func RegisterRoutes(route *gin.Engine) {
 		checkout.POST("/cart", controllers.Checkout)
 	}
 
+	user := v1.Group("/user")
+	{
+		user.Use(middleware.BaseAuthMiddleware())
+		user.GET("/transactions", controllers.GetUserTransactions)
+	}
+
 	//Add All route
 	//TestRoutes(route)
 }

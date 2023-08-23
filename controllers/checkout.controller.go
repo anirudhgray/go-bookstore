@@ -49,3 +49,15 @@ func Checkout(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Checkout successful"})
 }
+
+func GetUserTransactions(c *gin.Context) {
+	currentUser := c.MustGet("user").(*models.User)
+
+	var transactions []models.Transaction
+	if err := database.DB.Preload("Books").Find(&transactions, "user_id = ?", currentUser.ID).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user transactions"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"transactions": transactions})
+}
