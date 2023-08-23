@@ -60,6 +60,7 @@ func RegisterRoutes(route *gin.Engine) {
 	{
 		user.Use(middleware.BaseAuthMiddleware())
 		user.GET("/transactions", controllers.GetUserTransactions)
+		user.GET("/library", controllers.GetUserLibrary)
 	}
 
 	//Add All route
