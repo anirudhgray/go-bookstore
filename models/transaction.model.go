@@ -4,7 +4,7 @@ import "gorm.io/gorm"
 
 type Transaction struct {
 	gorm.Model
-	UserID        uint `gorm:"not null;unique;"` // FK to the user who initiated the transaction
+	UserID        uint // FK to the user who initiated the transaction
 	Amount        int64
 	Status        string
 	PaymentMethod string

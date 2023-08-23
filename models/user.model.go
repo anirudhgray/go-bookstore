@@ -23,9 +23,10 @@ type User struct {
 	Name         string `gorm:"size:255;not null;"`
 	Role         UserRole
 	Verified     bool
-	ShoppingCart ShoppingCart `gorm:"foreignKey:UserID;"` // one to one
-	UserLibrary  UserLibrary  `gorm:"foreignKey:UserID;"` // one to one
-	UserReviews  []Review     `gorm:"foreignKey:UserID;"` // one to many
+	ShoppingCart ShoppingCart   `gorm:"foreignKey:UserID;"` // one to one
+	UserLibrary  UserLibrary    `gorm:"foreignKey:UserID;"` // one to one
+	UserReviews  []*Review      `gorm:"foreignKey:UserID;"` // one to many
+	Transactions []*Transaction `gorm:"foreignKey:UserID"`  // one to many
 	// TODO wishlists, one to many
 }
 
