@@ -43,6 +43,8 @@ func RegisterRoutes(route *gin.Engine) {
 	{
 		books.Use(middleware.BaseAuthMiddleware())
 		books.GET("/catalog", controllers.GetBooks)
+		books.POST("/cart/:bookID", controllers.AddBookToCart)
+		books.GET("/cart", controllers.GetCart)
 	}
 
 	//Add All route

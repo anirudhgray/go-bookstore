@@ -38,7 +38,10 @@ func Register(c *gin.Context) {
 	}
 
 	user := models.User{Name: input.Name, Email: input.Email, Password: input.Password}
-	user.Associate()
+	if err := user.Associate(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
 	user.HashPassword()
 
 	if err := database.DB.Create(&user).Error; err != nil {
@@ -46,6 +49,11 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusCreated, gin.H{"message": "User created. Verification email sent!"})
 		// c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		// we lie!
+		return
+	}
+
+	if err := user.AttachCartAndLibrary(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 

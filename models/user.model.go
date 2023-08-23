@@ -4,6 +4,7 @@ import (
 	"html"
 	"strings"
 
+	"github.com/anirudhgray/balkan-assignment/infra/database"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -32,10 +33,22 @@ func (user *User) Associate() error {
 	user.Email = html.EscapeString(strings.TrimSpace(user.Email))
 	user.Name = html.EscapeString(strings.TrimSpace(user.Name))
 	user.Role = BaseUser
-	user.ShoppingCart = ShoppingCart{UserID: user.ID}
-	user.UserLibrary = UserLibrary{UserID: user.ID}
 	user.Verified = false
 
+	return nil
+}
+
+func (user *User) AttachCartAndLibrary() error {
+	shoppingCart := ShoppingCart{UserID: user.ID}
+	userLibrary := UserLibrary{UserID: user.ID}
+	if err := database.DB.Create(&shoppingCart).Error; err != nil {
+		return err
+	}
+	if err := database.DB.Create(&userLibrary).Error; err != nil {
+		return err
+	}
+	user.ShoppingCart = ShoppingCart{UserID: user.ID}
+	user.UserLibrary = UserLibrary{UserID: user.ID}
 	return nil
 }
 
