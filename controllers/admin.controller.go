@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"path/filepath"
 	"time"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
@@ -30,6 +31,17 @@ func CreateBook(c *gin.Context) {
 		return
 	}
 
+	file, err := c.FormFile("pdf")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	filePath := filepath.Join("uploads", file.Filename)
+	if err := c.SaveUploadedFile(file, filePath); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
 	// Create a new Book object
 	book := models.Book{
 		Name:      input.Name,
@@ -39,6 +51,7 @@ func CreateBook(c *gin.Context) {
 		Price:     input.Price,
 		ISBN:      input.ISBN,
 		Category:  models.BookCategory(input.Category), // Convert string to enum value
+		FilePath:  filePath,
 	}
 
 	// Save the book to the database
@@ -83,3 +96,5 @@ func EditBook(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Book updated successfully", "book": book})
 }
+
+// TODO add user functions such as deleting users, seeing statistics for how many users, how many deactivated, how many comments etc.

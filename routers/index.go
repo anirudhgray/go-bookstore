@@ -39,6 +39,12 @@ func RegisterRoutes(route *gin.Engine) {
 		admin.PATCH("/books/:id", controllers.EditBook)
 	}
 
+	books := v1.Group("/books")
+	{
+		books.Use(middleware.BaseAuthMiddleware())
+		books.GET("/catalog", controllers.GetBooks)
+	}
+
 	//Add All route
 	//TestRoutes(route)
 }

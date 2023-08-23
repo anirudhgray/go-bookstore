@@ -21,3 +21,6 @@ tmp/
 
 # Logs
 *.log
+
+# User uploads
+uploads/

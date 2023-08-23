@@ -24,7 +24,8 @@ type Book struct {
 	Publisher     string    `gorm:"not null"` // TODO FK to Publisher
 	Date          time.Time `gorm:"not null"`
 	Year          time.Time
-	Price         int64           `gorm:"not null"`
+	Price         int64 `gorm:"not null"`
+	FilePath      string
 	ISBN          string          `gorm:"size:255;not null"`
 	Category      BookCategory    `gorm:"not null"`
 	ShoppingCarts []*ShoppingCart `gorm:"many2many:cart_books;"` // TODO for a "In X carts currently!" feature
