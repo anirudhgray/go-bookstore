@@ -38,6 +38,8 @@ func RegisterRoutes(route *gin.Engine) {
 		admin.POST("/books", controllers.CreateBook)
 		admin.PATCH("/books/:id", controllers.EditBook)
 		admin.GET("/transactions", controllers.GetAllTransactions)
+		admin.DELETE("/reviews/:id", controllers.DeleteReview)
+		admin.DELETE("/books/:id", controllers.DeleteBook)
 	}
 
 	books := v1.Group("/books")

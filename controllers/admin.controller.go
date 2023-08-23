@@ -99,6 +99,7 @@ func EditBook(c *gin.Context) {
 
 // TODO add admin user functions such as deleting users, seeing statistics for how many users, how many deactivated, how many comments etc.
 
+// gets all shopping cart transactions done
 func GetAllTransactions(c *gin.Context) {
 	var transactions []models.Transaction
 	if err := database.DB.Preload("Books").Find(&transactions).Error; err != nil {
@@ -107,4 +108,39 @@ func GetAllTransactions(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"transactions": transactions})
+}
+
+// delete a review. Note that due to one review per user constraint, use cannot add another review, even once deleted (because soft delete). Not sure if this needs to be patched, might be a feature.
+func DeleteReview(c *gin.Context) {
+	var review models.Review
+	reviewID := c.Param("id")
+
+	if err := database.DB.First(&review, reviewID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Review not found"})
+		return
+	}
+
+	if err := database.DB.Delete(&review).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete review"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Review deleted successfully"})
+}
+
+func DeleteBook(c *gin.Context) {
+	var book models.Book
+	bookID := c.Param("id")
+
+	if err := database.DB.First(&book, bookID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
+		return
+	}
+
+	if err := database.DB.Delete(&book).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete book"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Book deleted successfully"})
 }
