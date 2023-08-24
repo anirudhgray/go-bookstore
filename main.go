@@ -33,3 +33,5 @@ func main() {
 	logger.Fatalf("%v", router.Run(config.ServerConfig()))
 
 }
+
+// TODO add cron job to clean up deleted libraries and carts

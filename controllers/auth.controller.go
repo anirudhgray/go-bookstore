@@ -136,9 +136,18 @@ func DeleteAccount(c *gin.Context) {
 
 	if entry.OTP == otp {
 		var user models.User
-		database.DB.Where("email = ?", email).First(&user)
+		database.DB.Where("email = ?", email).Preload("UserLibrary").Preload("ShoppingCart").First(&user)
+
+		if err := database.DB.Model(&user.UserLibrary).Association("Books").Clear(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to clear."})
+			return
+		}
+		if err := database.DB.Model(&user.ShoppingCart).Association("Books").Clear(); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to clear."})
+			return
+		}
 		// Delete the user account along with associated data
-		if err := database.DB.Select("ShoppingCart", "UserLibrary", "UserReviews").Delete(&user).Error; err != nil {
+		if err := database.DB.Unscoped().Select("ShoppingCart", "UserLibrary", "UserReviews").Delete(&user).Error; err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user account"})
 			return
 		}

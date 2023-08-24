@@ -26,8 +26,16 @@ type User struct {
 	ShoppingCart ShoppingCart   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"` // one to one
 	UserLibrary  UserLibrary    `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"` // one to one
 	UserReviews  []*Review      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"` // one to many
-	Transactions []*Transaction `gorm:"foreignKey:UserID"`                              // one to many
+	Transactions []*Transaction `gorm:"foreignKey:UserID;constraint:OnDelete:SET NULL"` // one to many
 	// TODO wishlists, one to many
+}
+
+func (user *User) BeforeDelete(tx *gorm.DB) error {
+	// Set UserID to null for related transactions
+	if err := tx.Model(&Transaction{}).Where("user_id = ?", user.ID).Update("user_id", nil).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (user *User) Associate() error {
