@@ -172,7 +172,7 @@ func DeleteBookHard(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Delete(&book).Error; err != nil {
+	if err := database.DB.Select("Reviews").Delete(&book).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete book"})
 		return
 	}
