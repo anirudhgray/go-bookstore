@@ -3,7 +3,6 @@ package models
 import (
 	"time"
 
-	"github.com/anirudhgray/balkan-assignment/infra/logger"
 	"gorm.io/gorm"
 )
 
@@ -43,9 +42,9 @@ func (book *Book) CalculateAvgRating() float64 {
 		count += 1.0
 	}
 	if count == 0 {
-		logger.Infof("Rip\n")
+		// logger.Infof("Rip\n")
 		return 0
 	}
-	logger.Infof("Rating: %v\n", total/count)
+	// logger.Infof("Rating: %v\n", total/count)
 	return (total / count)
 }

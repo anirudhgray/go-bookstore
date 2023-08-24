@@ -36,3 +36,4 @@ func main() {
 
 // TODO add cron job or route to clean up deleted books, verification entries, reviews, etc.
 // TODO initially just soft delete user. Do current hard delete routine after 24 hours.
+// TODO You trusted all proxies, this is NOT safe. We recommend you to set a value.

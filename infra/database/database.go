@@ -1,12 +1,13 @@
 package database
 
 import (
+	"log"
+
 	"github.com/spf13/viper"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 	"gorm.io/plugin/dbresolver"
-	"log"
 )
 
 var (
@@ -18,7 +19,7 @@ var (
 func DbConnection(masterDSN, replicaDSN string) error {
 	var db = DB
 
-	logMode := viper.GetBool("DB_LOG_MODE")
+	logMode := viper.GetBool("MASTER_DB_LOG_MODE")
 	debug := viper.GetBool("DEBUG")
 
 	loglevel := logger.Silent

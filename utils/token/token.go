@@ -27,7 +27,7 @@ func GenerateToken(user models.User) (string, error) {
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(tokenLifespan)).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	return token.SignedString([]byte(viper.GetString("API_SECRET")))
+	return token.SignedString([]byte(viper.GetString("API_SECRET"))) // secret to sign the JWT
 
 }
 
