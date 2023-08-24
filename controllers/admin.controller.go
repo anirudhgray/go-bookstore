@@ -75,8 +75,6 @@ type EditBookInput struct {
 	Category  string    `json:"category"`
 }
 
-// TODO GetAllBooks, including catalog_deleted ones.
-
 func EditBook(c *gin.Context) {
 	bookID := c.Param("id") // Extract the book ID from the URL parameter
 
