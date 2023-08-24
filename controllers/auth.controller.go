@@ -78,6 +78,11 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	if user.Banned {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You are banned! Contact admin if you think this is a mistake."})
+		return
+	}
+
 	if !user.Verified {
 		c.JSON(http.StatusForbidden, gin.H{"error": "Please verify your email first."})
 		return

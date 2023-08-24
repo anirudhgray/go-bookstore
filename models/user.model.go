@@ -23,6 +23,7 @@ type User struct {
 	Name         string `gorm:"size:255;not null;"`
 	Role         UserRole
 	Verified     bool
+	Banned       bool
 	ShoppingCart ShoppingCart   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"` // one to one
 	UserLibrary  UserLibrary    `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"` // one to one
 	UserReviews  []*Review      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"` // one to many

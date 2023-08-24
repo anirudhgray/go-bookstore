@@ -180,4 +180,22 @@ func DeleteBookHard(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Book deleted successfully"})
 }
 
-// TODO implement user banning once user deactivation implmented
+func BanUser(c *gin.Context) {
+	userID := c.Param("userID")
+	status := c.Query("status")
+
+	var user models.User
+	if err := database.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// Ban/Unban the user
+	user.Banned = status == "true"
+	if err := database.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to change ban status"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User ban status changed successfully"})
+}
