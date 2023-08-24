@@ -7,7 +7,6 @@ import (
 
 func Migrate() {
 	var migrationModels = []interface{}{
-		&models.Example{},
 		&models.User{},
 		&models.ShoppingCart{},
 		&models.Book{},

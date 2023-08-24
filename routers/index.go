@@ -16,14 +16,6 @@ func RegisterRoutes(route *gin.Engine) {
 
 	v1 := route.Group("/v1")
 
-	example := v1.Group("/example")
-	{
-		example.GET("/", controllers.GetData)
-		example.POST("/", controllers.Create)
-		example.GET("/:pid", controllers.GetSingleData)
-		example.PATCH("/:pid", controllers.Update)
-	}
-
 	auth := v1.Group("/auth")
 	{
 		auth.POST("/register", controllers.Register)
@@ -36,7 +28,7 @@ func RegisterRoutes(route *gin.Engine) {
 	admin := v1.Group("/admin")
 	{
 		admin.Use(middleware.AdminAuthMiddleware())
-		// admin.GET("/", controllers.GetData) // implement some sort of admin dashboard statistics thing here?
+		// implement some sort of admin dashboard statistics thing here?
 		admin.GET("/users", controllers.GetAllUsers)
 		admin.POST("/users/:userID", controllers.BanUser)
 		admin.POST("/books", controllers.CreateBook)
