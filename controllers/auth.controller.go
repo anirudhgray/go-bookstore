@@ -18,8 +18,6 @@ type RegisterInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
-// TODO forgot password
-
 type LoginInput struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
@@ -90,6 +88,40 @@ func Login(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": token, "user": user})
+}
+
+type ResetPasswordInput struct {
+	OldPassword string `json:"old_password"`
+	NewPassword string `json:"new_password"`
+}
+
+// ResetPasswordController handles the reset password by logged in user
+func ResetPassword(c *gin.Context) {
+	var input ResetPasswordInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	user, _ := c.Get("user")
+	currentUser := user.(*models.User)
+
+	if err := auth.VerifyPassword(input.OldPassword, currentUser.Password); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Incorrect current password"})
+		email.GenericSendMail("Password Reset Attempt", "Somebody attempted to change your password on Bookstore. Secure your account if this was not you.", currentUser.Email, currentUser.Name)
+		return
+	}
+
+	currentUser.Password = input.NewPassword
+	currentUser.HashPassword()
+
+	if err := database.DB.Save(&currentUser).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
+		return
+	}
+
+	email.GenericSendMail("Password Reset Successfully", "Your password for Bookstore was changed. Secure your account if this was not you.", currentUser.Email, currentUser.Name)
+	c.JSON(http.StatusOK, gin.H{"message": "Password reset successfully"})
 }
 
 // VerifyEmail takes your email and otp sent of registration to verify a user account.

@@ -23,6 +23,7 @@ func RegisterRoutes(route *gin.Engine) {
 		auth.POST("/verify", controllers.VerifyEmail)
 		auth.POST("/delete-account", controllers.DeleteAccount)
 		auth.POST("/request-account-deletion", middleware.BaseAuthMiddleware(), controllers.RequestDeletion)
+		auth.POST("/reset-password", middleware.BaseAuthMiddleware(), controllers.ResetPassword)
 	}
 
 	admin := v1.Group("/admin")
