@@ -24,6 +24,10 @@ func AttachCL(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "cart and library attached"})
 }
 
+// Paginated,
+// Search by name author, category or exact ISBN
+// Filter by category,
+// Sort by price or newness
 func GetBooks(c *gin.Context) {
 	var books []models.Book
 
@@ -40,11 +44,11 @@ func GetBooks(c *gin.Context) {
 	}
 	offset := (i - 1) * pageSize
 
-	// Search by name, author, or category
+	// Search by name, author, category, or exact ISBN
 	searchQuery := c.DefaultQuery("search", "")
 	if searchQuery != "" {
 		searchQuery = strings.ToLower(searchQuery)
-		query = query.Where("LOWER(name) LIKE ? OR LOWER(author) LIKE ? OR LOWER(category) LIKE ?", "%"+searchQuery+"%", "%"+searchQuery+"%", "%"+searchQuery+"%")
+		query = query.Where("LOWER(name) LIKE ? OR LOWER(author) LIKE ? OR LOWER(category) LIKE ? OR ISBN = ?", "%"+searchQuery+"%", "%"+searchQuery+"%", "%"+searchQuery+"%", searchQuery)
 	}
 
 	// Filter by category
@@ -54,11 +58,19 @@ func GetBooks(c *gin.Context) {
 	}
 
 	// Sort by price
-	sortByPrice := c.DefaultQuery("sortByPrice", "asc")
+	sortByPrice := c.DefaultQuery("sortByPrice", "")
 	if sortByPrice == "asc" {
 		query = query.Order("price ASC")
 	} else if sortByPrice == "desc" {
 		query = query.Order("price DESC")
+	}
+
+	// Sort by newly added
+	sortByNewness := c.DefaultQuery("sortByNewness", "")
+	if sortByNewness == "asc" {
+		query = query.Order("created_at ASC")
+	} else if sortByNewness == "desc" {
+		query = query.Order("created_at DESC")
 	}
 
 	// Apply pagination
