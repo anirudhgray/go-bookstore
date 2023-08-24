@@ -40,6 +40,7 @@ func RegisterRoutes(route *gin.Engine) {
 		admin.GET("/transactions", controllers.GetAllTransactions)
 		admin.DELETE("/reviews/:id", controllers.DeleteReview)
 		admin.DELETE("/books/:id", controllers.DeleteBook)
+		admin.DELETE("/books/:id/hard", controllers.DeleteBookHard) // from user libraries as well.
 	}
 
 	books := v1.Group("/books")

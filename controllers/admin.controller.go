@@ -44,14 +44,15 @@ func CreateBook(c *gin.Context) {
 
 	// Create a new Book object
 	book := models.Book{
-		Name:      input.Name,
-		Author:    input.Author,
-		Publisher: input.Publisher,
-		Date:      input.Date,
-		Price:     input.Price,
-		ISBN:      input.ISBN,
-		Category:  models.BookCategory(input.Category), // Convert string to enum value
-		FilePath:  filePath,
+		Name:          input.Name,
+		Author:        input.Author,
+		Publisher:     input.Publisher,
+		Date:          input.Date,
+		Price:         input.Price,
+		ISBN:          input.ISBN,
+		Category:      models.BookCategory(input.Category), // Convert string to enum value
+		FilePath:      filePath,
+		CatalogDelete: false,
 	}
 
 	// Save the book to the database
@@ -73,6 +74,8 @@ type EditBookInput struct {
 	ISBN      string    `json:"isbn"`
 	Category  string    `json:"category"`
 }
+
+// TODO GetAllBooks, including catalog_deleted ones.
 
 func EditBook(c *gin.Context) {
 	bookID := c.Param("id") // Extract the book ID from the URL parameter
@@ -126,7 +129,28 @@ func DeleteReview(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Review deleted successfully"})
 }
 
+// DeleteBook deletes a book from from catalog and carts, not from user libraries.
 func DeleteBook(c *gin.Context) {
+	bookID := c.Param("id")
+
+	var book models.Book
+	if err := database.DB.First(&book, bookID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
+		return
+	}
+
+	book.CatalogDelete = true
+
+	if err := database.DB.Save(&book).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete book"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Book has been marked as deleted"})
+}
+
+// DeleteBookHard deletes a book from user libraries as well. Do not use unless necessary.
+func DeleteBookHard(c *gin.Context) {
 	var book models.Book
 	bookID := c.Param("id")
 

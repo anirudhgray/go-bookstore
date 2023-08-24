@@ -64,6 +64,9 @@ func GetBooks(c *gin.Context) {
 	// Apply pagination
 	query = query.Offset(offset).Limit(pageSize)
 
+	// remove catalog deleted books
+	query = query.Where("catalog_delete = ?", false)
+
 	if err := query.Preload("Reviews").Find(&books).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch books"})
 		return
@@ -88,6 +91,11 @@ func GetBook(c *gin.Context) {
 	bookID := c.Param("bookID")
 
 	if err := database.DB.Preload("Reviews").First(&book, bookID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
+		return
+	}
+
+	if book.CatalogDelete {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
 		return
 	}

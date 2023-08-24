@@ -21,6 +21,11 @@ func AddBookToCart(c *gin.Context) {
 		return
 	}
 
+	if book.CatalogDelete {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found."})
+		return
+	}
+
 	var cart models.ShoppingCart
 	if err := database.DB.Model(&cart).Preload("Books").First(&cart, "user_id = ?", currentUser.ID).Error; err != nil {
 		fmt.Println(err)

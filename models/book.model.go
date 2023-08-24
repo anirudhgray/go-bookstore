@@ -32,6 +32,7 @@ type Book struct {
 	ShoppingCarts []*ShoppingCart `gorm:"many2many:cart_books;"`
 	UserLibraries []*UserLibrary  `gorm:"many2many:user_library_books;"`
 	Reviews       []*Review       `gorm:"foreignKey:BookID;not null"`
+	CatalogDelete bool
 }
 
 func (book *Book) CalculateAvgRating() float64 {
