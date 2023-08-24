@@ -39,13 +39,7 @@ type RegistrationEmail struct {
 	Text     string         `json:"text"`
 }
 
-func SendRegistrationMail(subject string, content string, toEmail string, userID uint, userName string, newUser bool) {
-	otp := ""
-	if newUser {
-		otp = GenerateOTP(6)
-		content += "http://0.0.0.0:8000/v1/auth/verify?email=" + toEmail + "&otp=" + otp
-
-	}
+func GenericSendMail(subject string, content string, toEmail string, userName string) {
 	url := "https://send.api.mailtrap.io/api/send"
 	method := "POST"
 
@@ -89,6 +83,16 @@ func SendRegistrationMail(subject string, content string, toEmail string, userID
 		return
 	}
 	defer res.Body.Close()
+}
+
+func SendRegistrationMail(subject string, content string, toEmail string, userID uint, userName string, newUser bool) {
+	otp := ""
+	if newUser {
+		otp = GenerateOTP(6)
+		content += "http://0.0.0.0:8000/v1/auth/verify?email=" + toEmail + "&otp=" + otp
+	}
+
+	GenericSendMail(subject, content, toEmail, userName)
 
 	if newUser {
 		entry := models.VerificationEntry{
@@ -104,50 +108,10 @@ func SendDeletionMail(toEmail string, userID uint, userName string) {
 	otp = GenerateOTP(6)
 	confirmationURL := ""
 	confirmationURL += "http://0.0.0.0:8000/v1/auth/delete-account?email=" + toEmail + "&otp=" + otp
+	content := "A request for the deletion of the bookstore account associated with your user has been made. If this was not you, please change your password. Otherwise, click on this link to confirm account deletion: " + confirmationURL
+	subject := "Request for account deletion."
 
-	url := "https://send.api.mailtrap.io/api/send"
-	method := "POST"
-
-	data := RegistrationEmail{
-		Subject: "Request for account deletion.",
-		From: EmailAddress{
-			Email: "mailtrap@anrdhmshr.tech",
-			Name:  "BOOKSTORE ADMIN",
-		},
-		To: []EmailAddress{
-			{
-				Email: toEmail,
-				Name:  userName,
-			},
-		},
-		Category: "BookStore",
-		Text:     "A request for the deletion of the bookstore account associated with your user has been made. If this was not you, please change your password. Otherwise, click on this link to confirm account deletion: " + confirmationURL,
-	}
-
-	jsonData, err := json.Marshal(data)
-	if err != nil {
-		logger.Errorf("Error: %v", err)
-		return
-	}
-
-	client := &http.Client{}
-	req, err := http.NewRequest(method, url, bytes.NewBuffer(jsonData))
-
-	if err != nil {
-		logger.Errorf("Error: %v", err)
-		return
-	}
-
-	bearer := fmt.Sprintf("Bearer %s", viper.GetString("MAILTRAP_API_TOKEN"))
-	req.Header.Add("Authorization", bearer)
-	req.Header.Add("Content-Type", "application/json")
-
-	res, err := client.Do(req)
-	if err != nil {
-		logger.Errorf("Error: %v", err)
-		return
-	}
-	defer res.Body.Close()
+	GenericSendMail(subject, content, toEmail, userName)
 
 	entry := models.DeletionConfirmation{
 		Email: toEmail,
