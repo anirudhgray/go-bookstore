@@ -29,6 +29,8 @@ func RegisterRoutes(route *gin.Engine) {
 		auth.POST("/register", controllers.Register)
 		auth.POST("/login", controllers.Login)
 		auth.GET("/verify", controllers.VerifyEmail)
+		auth.GET("/delete-account", controllers.DeleteAccount)
+		auth.POST("/request-account-deletion", middleware.BaseAuthMiddleware(), controllers.RequestDeletion)
 	}
 
 	admin := v1.Group("/admin")

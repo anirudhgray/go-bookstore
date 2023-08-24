@@ -6,5 +6,5 @@ import "gorm.io/gorm"
 type UserLibrary struct {
 	gorm.Model
 	UserID uint    `gorm:"not null;unique;"` // FK to users
-	Books  []*Book `gorm:"many2many:user_library_books;"`
+	Books  []*Book `gorm:"many2many:user_library_books;constraint:OnDelete:CASCADE"`
 }

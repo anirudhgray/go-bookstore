@@ -108,3 +108,44 @@ func VerifyEmail(c *gin.Context) {
 	}
 	c.JSON(http.StatusForbidden, gin.H{"error": "Invalid verification."})
 }
+
+func RequestDeletion(c *gin.Context) {
+	user, _ := c.Get("user")
+	currentUser := user.(*models.User)
+
+	// Check if a deletion confirmation record already exists for the user's email
+	var existingConfirmation models.DeletionConfirmation
+	if err := database.DB.Where("email = ?", currentUser.Email).First(&existingConfirmation).Error; err == nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Deletion request already submitted"})
+		return
+	}
+
+	// Send deletion email
+	email.SendDeletionMail(currentUser.Email, currentUser.ID, currentUser.Name)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Deletion request submitted"})
+}
+
+func DeleteAccount(c *gin.Context) {
+	email := c.Query("email")
+	otp := c.Query("otp")
+	var entry models.DeletionConfirmation
+	if result := database.DB.Where("email = ?", email).First(&entry); result.Error != nil {
+		logger.Errorf("Error while verifying: %v", result.Error)
+	}
+
+	if entry.OTP == otp {
+		var user models.User
+		database.DB.Where("email = ?", email).First(&user)
+		// Delete the user account along with associated data
+		if err := database.DB.Select("ShoppingCart", "UserLibrary", "UserReviews").Delete(&user).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user account"})
+			return
+		}
+		database.DB.Where("email = ?", user.Email).Delete(&models.DeletionConfirmation{})
+		c.JSON(http.StatusOK, gin.H{"message": "Account deleted successfully."})
+		return
+	}
+
+	c.JSON(http.StatusForbidden, gin.H{"message": "Invalid deletion verification. Account NOT deleted."})
+}
