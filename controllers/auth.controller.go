@@ -60,6 +60,32 @@ func Register(c *gin.Context) {
 	c.JSON(http.StatusCreated, gin.H{"message": "User created. Verification email sent!"})
 }
 
+func RequestVerificationAgain(c *gin.Context) {
+	useremail := c.Query("email")
+
+	var user models.User
+	if err := database.DB.Where("email = ?", useremail).First(&user).Error; err != nil {
+		c.JSON(http.StatusOK, gin.H{"message": "Verification email sent."})
+		return
+	}
+
+	if user.Verified {
+		c.JSON(http.StatusOK, gin.H{"message": "Verification email sent."})
+		return
+	}
+
+	// Check if a deletion confirmation record already exists for the user's email
+	var verificationEntry models.VerificationEntry
+	if err := database.DB.Where("email = ?", user.Email).First(&verificationEntry).Error; err == nil {
+		database.DB.Unscoped().Delete(&verificationEntry)
+	}
+
+	// Send deletion email
+	email.SendRegistrationMail("Account Verification.", "Please visit the following link to verify your account: ", user.Email, user.ID, user.Name, true)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Verification email sent."})
+}
+
 func Login(c *gin.Context) {
 	var input LoginInput
 

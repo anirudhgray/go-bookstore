@@ -21,6 +21,7 @@ func RegisterRoutes(route *gin.Engine) {
 		auth.POST("/register", controllers.Register)
 		auth.POST("/login", controllers.Login)
 		auth.POST("/verify", controllers.VerifyEmail)
+		auth.GET("/request-verification", controllers.RequestVerificationAgain)
 		auth.POST("/delete-account", controllers.DeleteAccount)
 		auth.POST("/request-account-deletion", middleware.BaseAuthMiddleware(), controllers.RequestDeletion)
 		auth.POST("/reset-password", middleware.BaseAuthMiddleware(), controllers.ResetPassword)
