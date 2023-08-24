@@ -109,7 +109,7 @@ func SendDeletionMail(toEmail string, userID uint, userName string) {
 	otp = GenerateOTP(6)
 	confirmationURL := ""
 	confirmationURL += "http://0.0.0.0:8000/v1/auth/delete-account?email=" + toEmail + "&otp=" + otp
-	content := "A request for the deletion of the bookstore account associated with your user has been made. If this was not you, please change your password. Otherwise, click on this link to confirm account deletion: " + confirmationURL
+	content := "A request for the deletion of the bookstore account associated with your user has been made. If this was not you, please change your password. Otherwise, click on this link to confirm account deletion: " + confirmationURL + " . This link will be active for 3 minutes."
 	subject := "Request for account deletion."
 
 	GenericSendMail(subject, content, toEmail, userName)
@@ -117,7 +117,25 @@ func SendDeletionMail(toEmail string, userID uint, userName string) {
 	entry := models.DeletionConfirmation{
 		Email:     toEmail,
 		OTP:       otp,
-		ValidTill: time.Now().Add(20 * time.Second),
+		ValidTill: time.Now().Add(3 * time.Minute),
+	}
+	database.DB.Create(&entry)
+}
+
+func SendForgotPasswordMail(toEmail string, userID uint, userName string) {
+	otp := ""
+	otp = GenerateOTP(6)
+	verificationURL := ""
+	verificationURL += "http://0.0.0.0:8000/v1/auth/set-forgotten-password?email=" + toEmail + "&otp=" + otp
+	content := "A forgot password request was made for the email associated with your account. If this was not you, feel free to ignore this email. Otherwise, click on this link to post your new password: " + verificationURL + " . This link will be active for 3 minutes."
+	subject := "Forgot Password."
+
+	GenericSendMail(subject, content, toEmail, userName)
+
+	entry := models.ForgotPassword{
+		Email:     toEmail,
+		OTP:       otp,
+		ValidTill: time.Now().Add(3 * time.Minute),
 	}
 	database.DB.Create(&entry)
 }

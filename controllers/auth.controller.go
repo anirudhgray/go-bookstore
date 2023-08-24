@@ -86,6 +86,73 @@ func RequestVerificationAgain(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Verification email sent."})
 }
 
+func ForgotPasswordRequest(c *gin.Context) {
+	useremail := c.Query("email")
+
+	var user models.User
+	if err := database.DB.Where("email = ?", useremail).First(&user).Error; err != nil {
+		c.JSON(http.StatusOK, gin.H{"message": "Forgot Password mail sent."})
+		return
+	}
+
+	var forgotPassword models.ForgotPassword
+	if err := database.DB.Where("email = ?", user.Email).First(&forgotPassword).Error; err == nil {
+		database.DB.Unscoped().Delete(&forgotPassword)
+	}
+
+	email.SendForgotPasswordMail(user.Email, user.ID, user.Name)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Forgot Password mail sent."})
+}
+
+type ForgotPasswordInput struct {
+	NewPassword string `json:"new_password"`
+}
+
+// after a forgot password request
+func SetNewPassword(c *gin.Context) {
+	var input ResetPasswordInput
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	useremail := c.Query("email")
+	otp := c.Query("otp")
+	var entry models.ForgotPassword
+	if result := database.DB.Where("email = ?", useremail).First(&entry); result.Error != nil {
+		logger.Errorf("Error while verifying: %v", result.Error)
+		c.JSON(http.StatusForbidden, gin.H{"message": "Invalid deletion verification. Account NOT deleted."})
+		return
+	}
+
+	if entry.ValidTill.Before(time.Now()) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "token expired, please request forgot password again."})
+		return
+	}
+
+	if entry.OTP == otp {
+		var user models.User
+		database.DB.Where("email = ?", useremail).First(&user)
+
+		user.Password = input.NewPassword
+		user.HashPassword()
+
+		if err := database.DB.Save(&user).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
+			return
+		}
+
+		email.GenericSendMail("Password Reset", "Password for your account was reset recently.", user.Email, user.Name)
+
+		// database.DB.Where("email = ?", user.Email).Delete(&models.ForgotPassword{})
+		c.JSON(http.StatusOK, gin.H{"message": "Password set successfully. Please proceed to login."})
+		return
+	}
+
+	c.JSON(http.StatusForbidden, gin.H{"message": "Invalid verification. Password not updated."})
+}
+
 func Login(c *gin.Context) {
 	var input LoginInput
 
@@ -222,7 +289,7 @@ func DeleteAccount(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user account"})
 			return
 		}
-		database.DB.Where("email = ?", user.Email).Delete(&models.DeletionConfirmation{})
+		// database.DB.Where("email = ?", user.Email).Delete(&models.DeletionConfirmation{})
 		c.JSON(http.StatusOK, gin.H{"message": "Account deleted successfully."})
 		return
 	}
