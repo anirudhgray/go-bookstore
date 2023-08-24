@@ -35,6 +35,7 @@ func RegisterRoutes(route *gin.Engine) {
 	{
 		admin.Use(middleware.AdminAuthMiddleware())
 		// admin.GET("/", controllers.GetData) // implement some sort of admin dashboard statistics thing here?
+		admin.GET("/users", controllers.GetAllUsers)
 		admin.POST("/books", controllers.CreateBook)
 		admin.PATCH("/books/:id", controllers.EditBook)
 		admin.GET("/transactions", controllers.GetAllTransactions)

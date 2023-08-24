@@ -111,6 +111,19 @@ func GetAllTransactions(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"transactions": transactions})
 }
 
+// GetAllUsers gets undeleted users.
+func GetAllUsers(c *gin.Context) {
+	var users []models.User
+
+	// Fetch all users from the database
+	if err := database.DB.Find(&users).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
+		return
+	}
+
+	c.JSON(http.StatusOK, users)
+}
+
 // delete a review. Note that due to one review per user constraint, use cannot add another review, even once deleted (because soft delete). Not sure if this needs to be patched, might be a feature.
 func DeleteReview(c *gin.Context) {
 	var review models.Review
