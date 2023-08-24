@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
 	"github.com/anirudhgray/balkan-assignment/infra/logger"
@@ -107,7 +108,10 @@ func VerifyEmail(c *gin.Context) {
 			logger.Errorf("Error while verifying: %v", result.Error)
 			return
 		}
-		database.DB.Where("email = ?", email).Delete(&models.VerificationEntry{})
+		var verificationEntry models.VerificationEntry
+		if err := database.DB.Where("email = ?", email).First(&verificationEntry).Error; err == nil {
+			database.DB.Unscoped().Delete(&verificationEntry)
+		}
 		c.JSON(http.StatusOK, gin.H{"message": "Verified! You can now log in."})
 		return
 	}
@@ -121,8 +125,7 @@ func RequestDeletion(c *gin.Context) {
 	// Check if a deletion confirmation record already exists for the user's email
 	var existingConfirmation models.DeletionConfirmation
 	if err := database.DB.Where("email = ?", currentUser.Email).First(&existingConfirmation).Error; err == nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Deletion request already submitted"})
-		return
+		database.DB.Unscoped().Delete(&existingConfirmation)
 	}
 
 	// Send deletion email
@@ -137,6 +140,11 @@ func DeleteAccount(c *gin.Context) {
 	var entry models.DeletionConfirmation
 	if result := database.DB.Where("email = ?", email).First(&entry); result.Error != nil {
 		logger.Errorf("Error while verifying: %v", result.Error)
+	}
+
+	if entry.ValidTill.Before(time.Now()) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "token expired, please request again."})
+		return
 	}
 
 	if entry.OTP == otp {

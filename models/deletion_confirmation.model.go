@@ -1,9 +1,14 @@
 package models
 
-import "gorm.io/gorm"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type DeletionConfirmation struct {
 	gorm.Model
-	Email string `gorm:"unique"`
-	OTP   string
+	Email     string `gorm:"unique"`
+	OTP       string
+	ValidTill time.Time
 }

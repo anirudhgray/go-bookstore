@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/big"
 	"net/http"
+	"time"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
 	"github.com/anirudhgray/balkan-assignment/infra/logger"
@@ -114,8 +115,9 @@ func SendDeletionMail(toEmail string, userID uint, userName string) {
 	GenericSendMail(subject, content, toEmail, userName)
 
 	entry := models.DeletionConfirmation{
-		Email: toEmail,
-		OTP:   otp,
+		Email:     toEmail,
+		OTP:       otp,
+		ValidTill: time.Now().Add(20 * time.Second),
 	}
 	database.DB.Create(&entry)
 }
