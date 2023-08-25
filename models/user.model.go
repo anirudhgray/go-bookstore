@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
+	"github.com/anirudhgray/balkan-assignment/infra/logger"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -42,7 +43,16 @@ func (user *User) BeforeDelete(tx *gorm.DB) error {
 func (user *User) Associate() error {
 	user.Email = html.EscapeString(strings.TrimSpace(user.Email))
 	user.Name = html.EscapeString(strings.TrimSpace(user.Name))
-	user.Role = BaseUser
+	var adminCount int64
+	if err := database.DB.Model(&User{}).Where("role = ?", Admin).Count(&adminCount).Error; err != nil {
+		logger.Errorf("Failed to check for admin.")
+	}
+
+	if adminCount == 0 {
+		user.Role = Admin
+	} else {
+		user.Role = BaseUser
+	}
 	user.Verified = false
 
 	return nil
