@@ -18,6 +18,11 @@ func Checkout(c *gin.Context) {
 		return
 	}
 
+	if len(cart.Books) == 0 {
+		c.JSON(http.StatusTeapot, gin.H{"error": "Your cart is empty!"})
+		return
+	}
+
 	// Create a new transaction
 	transaction := models.Transaction{
 		UserID:        currentUser.ID,
