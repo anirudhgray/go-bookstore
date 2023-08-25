@@ -1,5 +1,9 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/LECuYE4o)
 
+### Deployed Links
+- API baseurl: http://170.187.232.79/api/v1
+- Health Check: http://170.187.232.79/api/health
+- API Docs: https://documenter.getpostman.com/view/19697822/2s9Y5Wxifq
 ## How to run locally
 1. Clone the repo.
 2. Make sure you have docker/docker desktop installed, and a docker daemon running.
