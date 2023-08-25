@@ -13,8 +13,9 @@ import (
 type UserRole string
 
 const (
-	Admin    UserRole = "admin"
-	BaseUser UserRole = "base_user"
+	SuperAdmin UserRole = "super_admin"
+	Admin      UserRole = "admin"
+	BaseUser   UserRole = "base_user"
 )
 
 type User struct {
@@ -49,7 +50,7 @@ func (user *User) Associate() error {
 	}
 
 	if adminCount == 0 {
-		user.Role = Admin
+		user.Role = SuperAdmin
 	} else {
 		user.Role = BaseUser
 	}

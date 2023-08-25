@@ -197,3 +197,53 @@ func BanUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "User ban status changed successfully"})
 }
+
+func PromoteUserToAdmin(c *gin.Context) {
+	// Get the user ID of user to promote
+	userID := c.Param("userID")
+	currentUser := c.MustGet("user").(*models.User)
+
+	var user models.User
+	if err := database.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	if user.Email == currentUser.Email {
+		c.JSON(http.StatusTeapot, gin.H{"error": "You can't promote yourself!"})
+		return
+	}
+
+	user.Role = models.Admin
+	if err := database.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Specified user is now an admin"})
+}
+
+func DemoteUserToBase(c *gin.Context) {
+	// Get the user ID of user to promote
+	userID := c.Param("userID")
+	currentUser := c.MustGet("user").(*models.User)
+
+	var user models.User
+	if err := database.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	if user.Email == currentUser.Email {
+		c.JSON(http.StatusTeapot, gin.H{"error": "You can't demote yourself!"})
+		return
+	}
+
+	user.Role = models.BaseUser
+	if err := database.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Specified user is now a base user."})
+}

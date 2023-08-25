@@ -43,6 +43,13 @@ func RegisterRoutes(route *gin.Engine) {
 		admin.DELETE("/books/:id/hard", controllers.DeleteBookHard) // from user libraries as well.
 	}
 
+	superadmin := v1.Group("/superadmin")
+	{
+		superadmin.Use(middleware.SuperAdminAuthMiddleware())
+		superadmin.POST("/users/promote/:userID", controllers.PromoteUserToAdmin)
+		superadmin.POST("/users/demote/:userID", controllers.DemoteUserToBase)
+	}
+
 	books := v1.Group("/books")
 	{
 		books.Use(middleware.BaseAuthMiddleware())
