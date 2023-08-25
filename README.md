@@ -6,6 +6,9 @@
 3. Rename `sample.env` to `.env`, and set JWT signing secret (API_SECRET) with `openssl rand -hex 32`.
 4. For MAILTRAP_API_TOKEN, obtain a free api token from https://mailtrap.io/, or run the app without it (confirmation mails, etc, will not be sent in that case.)
 5. `make dev`
+6. App will be served at http://0.0.0.0:8000/ by default. Check http://0.0.0.0:8000/health to see if everything is OK on serverside.
+7. PG Admin will be served at http://0.0.0.0:5050/browser.
+8. API Docs at: https://documenter.getpostman.com/view/19697822/2s9Y5Wxifq
    
 # Features
 1. Auth/User: JWT Auth. Role Based (Base User and Admin) access to resources. Hashed Password. Password Strength Check. After implementing my registration controllers I realised that a more secure way to do it would have been by asking users to first specify an email, confirm that email, and then ask them to set a password. This would guard against user enumeration attacks. Right now, I'm guarding against it by essentially lying — I say that the confirmation email got sent if you try making an account with an existing email. This could be confusing, however, if the user has genuinely forgotten if they had an account associated with a particular email or not. Alternatively, I could send a warning email in such cases.
@@ -20,12 +23,10 @@
 10. User Library: library of books bought by a user. The user can download any of them as many times as they want. Currently stored on server locally, will shift to GCP Buckets or AWS S3.
 11. Reviews: Users can only review a book that they have bought (ie, which is in their library). Reviews have a comment, and a rating (which is used to calc avg rating for the book).
 12. Logging with Retention (Rotating Log): Currently logging to a local logfile.
-
 ## Where I ran into issues:
 - Did not initially realise that gorm's auto-migrations do not, in fact, drop unused columns. While it does make sense as a default so that we don't lose data... well, anyway, spent some time trying to debug why my many2many join table had an unrelated column in it. Ended up dropping the table and then running migrations, will make sure to use my own migration scripts or a more full fledged library like goose.
 - Needed to enter associations mode to delete properly, otherwise only the reference would be yeeted.
 - The whole flow of user deletion. The culprit? Gorm, yet again.
-
 # Project Structure
 ```
 .
@@ -92,8 +93,12 @@
     └── token
         └── token.go
 ```
+## Explanation
 - `models/`: The model structs for each table in my DB, along with their relations.
 - `controllers/`: Combined handlers for each route, along with controllers for the business logic, as well as data accessing repository functions.
 - `routers/`: API routes and auth+cors middleware.
 - `utils/`: Reusable utility functions for business logic in controllers. Eg, for mailing, password validation, etc.
 - `config/`: Initial reading in config from .env, setting up server and DB configurations.
+## ERD
+**Note:** This does not show 1:1 relations properly (shown as 1:N). Will update.
+![erd](erd.png)
