@@ -25,5 +25,12 @@ services:
       - postgres_db:postgres_db
     restart: on-failure
 
+  nginx:
+    build: "./nginx"
+    ports:
+      - "80:80"
+    depends_on:
+      - server
+
 volumes:
   prod_postgres_data:

@@ -13,12 +13,12 @@ dev:
 	docker-compose -f docker-compose-dev.yml up
 
 build:
-	docker-compose -f docker-compose-prod.yml build
+	docker-compose -f docker-compose.yml build
 	docker-compose -f docker-compose-dev.yml down build
 
 production:
-	docker-compose -f docker-compose-prod.yml up -d --build
+	docker-compose -f docker-compose.yml up -d --build
 
 clean:
-	docker-compose -f docker-compose-prod.yml down -v
+	docker-compose -f docker-compose.yml down -v
 	docker-compose -f docker-compose-dev.yml down -v
