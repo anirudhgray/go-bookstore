@@ -40,7 +40,7 @@ type RegistrationEmail struct {
 	Text     string         `json:"text"`
 }
 
-func GenericSendMail(subject string, content string, toEmail string, userName string) {
+func GenericSendMail(subject string, content string, toEmail string, userName string) error {
 	url := "https://send.api.mailtrap.io/api/send"
 	method := "POST"
 
@@ -63,7 +63,7 @@ func GenericSendMail(subject string, content string, toEmail string, userName st
 	jsonData, err := json.Marshal(data)
 	if err != nil {
 		logger.Errorf("Error: %v", err)
-		return
+		return err
 	}
 
 	client := &http.Client{}
@@ -71,7 +71,7 @@ func GenericSendMail(subject string, content string, toEmail string, userName st
 
 	if err != nil {
 		logger.Errorf("Error: %v", err)
-		return
+		return err
 	}
 
 	bearer := fmt.Sprintf("Bearer %s", viper.GetString("MAILTRAP_API_TOKEN"))
@@ -81,19 +81,23 @@ func GenericSendMail(subject string, content string, toEmail string, userName st
 	res, err := client.Do(req)
 	if err != nil {
 		logger.Errorf("Error: %v", err)
-		return
+		return err
 	}
 	defer res.Body.Close()
+	return nil
 }
 
-func SendRegistrationMail(subject string, content string, toEmail string, userID uint, userName string, newUser bool) {
+func SendRegistrationMail(subject string, content string, toEmail string, userID uint, userName string, newUser bool) error {
 	otp := ""
 	if newUser {
 		otp = GenerateOTP(6)
 		content += "http://0.0.0.0:8000/v1/auth/verify?email=" + toEmail + "&otp=" + otp
 	}
 
-	GenericSendMail(subject, content, toEmail, userName)
+	err := GenericSendMail(subject, content, toEmail, userName)
+	if err != nil {
+		return err
+	}
 
 	if newUser {
 		entry := models.VerificationEntry{
@@ -102,6 +106,7 @@ func SendRegistrationMail(subject string, content string, toEmail string, userID
 		}
 		database.DB.Create(&entry)
 	}
+	return nil
 }
 
 func SendDeletionMail(toEmail string, userID uint, userName string) {

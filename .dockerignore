@@ -1,6 +1,6 @@
 # flyctl launch added from .gitignore
 # Binaries for programs and plugins
-**/.env
+# **/.env
 **/*.exe
 **/*.exe~
 **/*.dll

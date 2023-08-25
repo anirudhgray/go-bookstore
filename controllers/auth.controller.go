@@ -81,9 +81,13 @@ func RequestVerificationAgain(c *gin.Context) {
 	}
 
 	// Send deletion email
-	email.SendRegistrationMail("Account Verification.", "Please visit the following link to verify your account: ", user.Email, user.ID, user.Name, true)
+	err := email.SendRegistrationMail("Account Verification.", "Please visit the following link to verify your account: ", user.Email, user.ID, user.Name, true)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error in sending email."})
+		return
+	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Verification email sent."})
+	c.JSON(http.StatusOK, gin.H{"message": "Verification email sent to you again."})
 }
 
 func ForgotPasswordRequest(c *gin.Context) {

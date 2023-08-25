@@ -41,13 +41,6 @@ services:
       - .:/app
     restart: always
 
-  nginx:
-    build: "./nginx"
-    ports:
-      - "80:80"
-    depends_on:
-      - server
-
 volumes:
   dev_postgres_data:
   pgadmin_data:
