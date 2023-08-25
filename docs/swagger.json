@@ -1,0 +1,24 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "Securely buy and review books.",
+        "title": "Secure Bookstore API",
+        "contact": {
+            "name": "anirudhgray"
+        },
+        "version": "1.0"
+    },
+    "host": "http://bookstore.anrdhmshr.tech",
+    "basePath": "/api/v1",
+    "paths": {
+        "/auth/register": {
+            "post": {
+                "tags": [
+                    "auth"
+                ],
+                "summary": "register a new base user",
+                "responses": {}
+            }
+        }
+    }
+}

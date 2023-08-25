@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/anirudhgray/balkan-assignment/config"
+	_ "github.com/anirudhgray/balkan-assignment/docs"
 	"github.com/anirudhgray/balkan-assignment/infra/database"
 	"github.com/anirudhgray/balkan-assignment/infra/logger"
 	"github.com/anirudhgray/balkan-assignment/migrations"
@@ -11,10 +12,16 @@ import (
 	"github.com/spf13/viper"
 )
 
+// @title			Secure Bookstore API
+// @version		1.0
+// @description	Securely buy and review books.
+// @contact.name	anirudhgray
+// @host			http://bookstore.anrdhmshr.tech
+// @BasePath		/api/v1
 func main() {
 
 	//set timezone
-	viper.SetDefault("SERVER_TIMEZONE", "Asia/Dhaka")
+	viper.SetDefault("SERVER_TIMEZONE", "Asia/Calcutta")
 	loc, _ := time.LoadLocation(viper.GetString("SERVER_TIMEZONE"))
 	time.Local = loc
 

@@ -1,0 +1,16 @@
+basePath: /api/v1
+host: http://bookstore.anrdhmshr.tech
+info:
+  contact:
+    name: anirudhgray
+  description: Securely buy and review books.
+  title: Secure Bookstore API
+  version: "1.0"
+paths:
+  /auth/register:
+    post:
+      responses: {}
+      summary: register a new base user
+      tags:
+      - auth
+swagger: "2.0"

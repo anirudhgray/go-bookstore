@@ -142,6 +142,7 @@ func DeleteReview(c *gin.Context) {
 
 // DeleteBook deletes a book from from catalog and carts, not from user libraries.
 func DeleteBook(c *gin.Context) {
+	// TODO delete book by isbn
 	bookID := c.Param("id")
 
 	var book models.Book

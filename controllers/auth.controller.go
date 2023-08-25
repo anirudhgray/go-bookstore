@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"time"
 
+	_ "github.com/anirudhgray/balkan-assignment/docs"
 	"github.com/anirudhgray/balkan-assignment/infra/database"
 	"github.com/anirudhgray/balkan-assignment/infra/logger"
 	"github.com/anirudhgray/balkan-assignment/models"
@@ -23,6 +24,10 @@ type LoginInput struct {
 	Password string `json:"password" binding:"required"`
 }
 
+// Register godoc
+// @Summary register a new base user
+// @Tags auth
+// @Router /auth/register [post]
 func Register(c *gin.Context) {
 	var input RegisterInput
 

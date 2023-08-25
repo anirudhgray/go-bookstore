@@ -6,6 +6,8 @@ import (
 	"github.com/anirudhgray/balkan-assignment/controllers"
 	"github.com/anirudhgray/balkan-assignment/routers/middleware"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func RegisterRoutes(route *gin.Engine) {
@@ -15,6 +17,8 @@ func RegisterRoutes(route *gin.Engine) {
 	route.GET("/health", func(ctx *gin.Context) { ctx.JSON(http.StatusOK, gin.H{"live": "ok"}) })
 
 	v1 := route.Group("/v1")
+
+	v1.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	auth := v1.Group("/auth")
 	{
