@@ -1,10 +1,19 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/LECuYE4o)
 
-### Deployed Links
-- API baseurl: http://bookstore.anrdhmshr.tech/api/v1 (or http://170.187.232.79/api/v1)
-- Health Check: http://bookstore.anrdhmshr.tech/api/health (or http://170.187.232.79/api/health)
+# Deployed Links
+- API baseurl: http://bookstore.anrdhmshr.tech/api/v1
+- Health Check: http://bookstore.anrdhmshr.tech/api/health
 - API Docs: https://documenter.getpostman.com/view/19697822/2s9Y5Wxifq
-## How to run locally
+# Table of Contents
+- [Deployed Links](#deployed-links)
+- [Table of Contents](#table-of-contents)
+- [How to run locally](#how-to-run-locally)
+- [Features](#features)
+  - [Where I ran into issues:](#where-i-ran-into-issues)
+- [Project Structure](#project-structure)
+  - [Explanation](#explanation)
+  - [ERD](#erd)
+# How to run locally
 1. Clone the repo.
 2. Make sure you have docker/docker desktop installed, and a docker daemon running.
 3. Rename `sample.env` to `.env`, and set JWT signing secret (API_SECRET) with `openssl rand -hex 32`.
