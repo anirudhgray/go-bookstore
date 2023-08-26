@@ -25,6 +25,7 @@
     - [13. Reverse Proxy on prod using nginx.](#13-reverse-proxy-on-prod-using-nginx)
 - [Recommendation Engine](#recommendation-engine)
     - [Rough flow for giving users recommendations:](#rough-flow-for-giving-users-recommendations)
+    - [Caveats](#caveats)
 - [Where I ran into issues:](#where-i-ran-into-issues)
 - [Project Structure](#project-structure)
   - [Explanation](#explanation)
@@ -83,9 +84,11 @@ We keep a record of each user's likes and dislikes (let's base this on review ra
 5. For each of those items, calculate the probability that it should be recommended to the current user. How do we do this:
    1. Result = Numerator / Denominator
    2. Get other users who liked or disliked that item.
-   3. Numerator is the sum of the similarity indices of all these users, with the current user.
+   3. Numerator is the sum of the similarity indices of all these users who liked it - sum of indices of users who disliked it.
    4. Denominator is simply the total number of users of liked or disliked the item.
 6. Now we can rank the items based on this calculated probability, and give X number of recommendations.
+### Caveats
+I'm thinking I'll do all this in-memory. Like, user wants reccs => I do all of the above and return some reccs. Maybe a better way to handle this would be to use something like Redis which apparently has nice features to work with sets, and generate reccs periodically. Also, a major issue with collaborative filtering is that of "cold start" — since this method relies on other similar users, what do you do for the first few users?
 # Where I ran into issues:
 - Did not initially realise that gorm's auto-migrations do not, in fact, drop unused columns. While it does make sense as a default so that we don't lose data... well, anyway, spent some time trying to debug why my many2many join table had an unrelated column in it. Ended up dropping the table and then running migrations, will make sure to use my own migration scripts or a more full fledged library like goose.
 - Needed to enter associations mode to delete properly, otherwise only the reference would be yeeted.

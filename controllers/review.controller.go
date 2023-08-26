@@ -34,7 +34,7 @@ func AddReview(c *gin.Context) {
 
 	// Check if the user has the book in their UserLibrary
 	if !currentUser.HasBookInLibrary(bookID) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "You must own the book to review it"})
+		c.JSON(http.StatusForbidden, gin.H{"error": "You must own the book to review it."})
 		return
 	}
 

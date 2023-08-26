@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
 	"github.com/anirudhgray/balkan-assignment/models"
@@ -13,7 +14,12 @@ func AddBookToCart(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(*models.User)
 
-	bookID := c.Param("bookID")
+	id := c.Param("bookID")
+	bookID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
+		return
+	}
 
 	var book models.Book
 	if err := database.DB.First(&book, bookID).Error; err != nil {
@@ -84,7 +90,12 @@ func RemoveFromCart(c *gin.Context) {
 	user, _ := c.Get("user")
 	currentUser := user.(*models.User)
 
-	bookID := c.Param("bookID")
+	id := c.Param("bookID")
+	bookID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
+		return
+	}
 
 	var book models.Book
 	if err := database.DB.First(&book, bookID).Error; err != nil {

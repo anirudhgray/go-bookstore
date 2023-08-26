@@ -100,7 +100,12 @@ func GetBooks(c *gin.Context) {
 
 func GetBook(c *gin.Context) {
 	var book models.Book
-	bookID := c.Param("bookID")
+	id := c.Param("bookID")
+	bookID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
+		return
+	}
 
 	if err := database.DB.Preload("Reviews").First(&book, bookID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
@@ -124,7 +129,12 @@ func GetBook(c *gin.Context) {
 }
 
 func DownloadBook(c *gin.Context) {
-	bookID := c.Param("bookID")
+	id := c.Param("bookID")
+	bookID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
+		return
+	}
 
 	var book models.Book
 	if err := database.DB.First(&book, bookID).Error; err != nil {

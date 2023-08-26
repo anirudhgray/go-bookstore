@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"path/filepath"
+	"strconv"
 	"time"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
@@ -23,6 +24,7 @@ type CreateBookInput struct {
 
 // CreateBook creates a new book. Admins only.
 func CreateBook(c *gin.Context) {
+	// TODO catbin or smth for files
 	var input CreateBookInput
 
 	// Validate request data
@@ -76,7 +78,12 @@ type EditBookInput struct {
 }
 
 func EditBook(c *gin.Context) {
-	bookID := c.Param("id") // Extract the book ID from the URL parameter
+	id := c.Param("id")
+	bookID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
+		return
+	}
 
 	var input EditBookInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -125,7 +132,12 @@ func GetAllUsers(c *gin.Context) {
 // delete a review. Note that due to one review per user constraint, use cannot add another review, even once deleted (because soft delete). Not sure if this needs to be patched, might be a feature.
 func DeleteReview(c *gin.Context) {
 	var review models.Review
-	reviewID := c.Param("id")
+	id := c.Param("id")
+	reviewID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
+		return
+	}
 
 	if err := database.DB.First(&review, reviewID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Review not found"})
@@ -143,7 +155,12 @@ func DeleteReview(c *gin.Context) {
 // DeleteBook deletes a book from from catalog and carts, not from user libraries.
 func DeleteBook(c *gin.Context) {
 	// TODO delete book by isbn
-	bookID := c.Param("id")
+	id := c.Param("id")
+	bookID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
+		return
+	}
 
 	var book models.Book
 	if err := database.DB.First(&book, bookID).Error; err != nil {
@@ -164,7 +181,13 @@ func DeleteBook(c *gin.Context) {
 // DeleteBookHard deletes a book from user libraries as well. Do not use unless necessary.
 func DeleteBookHard(c *gin.Context) {
 	var book models.Book
-	bookID := c.Param("id")
+	id := c.Param("id")
+	bookID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
+		return
+	}
+	// TODO goddamn this leaves me open to sqli https://gorm.io/docs/security.html
 
 	if err := database.DB.First(&book, bookID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
@@ -180,7 +203,12 @@ func DeleteBookHard(c *gin.Context) {
 }
 
 func BanUser(c *gin.Context) {
-	userID := c.Param("userID")
+	id := c.Param("userID")
+	userID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
+		return
+	}
 	status := c.Query("status")
 
 	var user models.User
@@ -201,7 +229,12 @@ func BanUser(c *gin.Context) {
 
 func PromoteUserToAdmin(c *gin.Context) {
 	// Get the user ID of user to promote
-	userID := c.Param("userID")
+	id := c.Param("userID")
+	userID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
+		return
+	}
 	currentUser := c.MustGet("user").(*models.User)
 
 	var user models.User
@@ -226,7 +259,12 @@ func PromoteUserToAdmin(c *gin.Context) {
 
 func DemoteUserToBase(c *gin.Context) {
 	// Get the user ID of user to promote
-	userID := c.Param("userID")
+	id := c.Param("userID")
+	userID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
+		return
+	}
 	currentUser := c.MustGet("user").(*models.User)
 
 	var user models.User
