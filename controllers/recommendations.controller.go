@@ -25,5 +25,21 @@ func GenerateRecommendations(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"others": otherUsers})
+	similarities, err := recommender.CalculateSimilaritiesWithOtherUsers(userID, otherUsers, likes, dislikes)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	unreviewed, err := recommender.GetUnreviewedBooks(userID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		return
+	}
+
+	recprobs := recommender.CalculateRecommendationProbabilities(userID, unreviewed, similarities)
+
+	recommendedBooks := recommender.GetRecommendedBooksSortedAndPaginated(recprobs, 1, 20)
+
+	c.JSON(http.StatusOK, gin.H{"recommendations": recommendedBooks})
 }
