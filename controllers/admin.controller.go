@@ -26,7 +26,6 @@ type CreateBookInput struct {
 
 // CreateBook creates a new book. Admins only.
 func CreateBook(c *gin.Context) {
-	// TODO catbin or smth for files
 	var input CreateBookInput
 
 	// Validate request data
@@ -183,7 +182,6 @@ func DeleteReview(c *gin.Context) {
 
 // DeleteBook deletes a book from from catalog and carts, not from user libraries.
 func DeleteBook(c *gin.Context) {
-	// TODO delete book by isbn
 	id := c.Param("id")
 	bookID, err := strconv.Atoi(id)
 	if err != nil {

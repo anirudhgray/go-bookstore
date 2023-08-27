@@ -26,6 +26,7 @@ type User struct {
 	Role         UserRole
 	Verified     bool
 	Banned       bool
+	Credits      int
 	ShoppingCart ShoppingCart   `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"` // one to one
 	UserLibrary  UserLibrary    `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"` // one to one
 	UserReviews  []*Review      `gorm:"foreignKey:UserID;constraint:OnDelete:CASCADE;"` // one to many

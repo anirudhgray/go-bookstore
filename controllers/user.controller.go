@@ -17,7 +17,7 @@ func GetUserTransactions(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"transactions": transactions})
+	c.JSON(http.StatusOK, gin.H{"balance": currentUser.Credits, "transactions": transactions})
 }
 
 func GetUserLibrary(c *gin.Context) {

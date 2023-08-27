@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
 	"github.com/anirudhgray/balkan-assignment/models"
@@ -23,13 +24,23 @@ func Checkout(c *gin.Context) {
 		return
 	}
 
+	// check user funds
+	str := "Insufficient credits. Cart Total: " + strconv.Itoa(int(cart.CalculateTotalCartPrice())) + ". Current Credit Balance: " + strconv.Itoa(currentUser.Credits)
+	if cart.CalculateTotalCartPrice() > int64(currentUser.Credits) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": str})
+		return
+	}
+
 	// Create a new transaction
 	transaction := models.Transaction{
-		UserID:        currentUser.ID,
-		Amount:        cart.CalculateTotalCartPrice(),
-		Status:        "completed",
-		PaymentMethod: "UPI",
+		UserID:         currentUser.ID,
+		Amount:         cart.CalculateTotalCartPrice(),
+		Status:         "completed",
+		PaymentMethod:  "UPI",
+		CreditPurchase: false,
 	}
+
+	currentUser.Credits -= int(cart.CalculateTotalCartPrice())
 
 	for _, book := range cart.Books {
 		transaction.Books = append(transaction.Books, book)
@@ -52,5 +63,44 @@ func Checkout(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Checkout successful"})
+	str = "Checkout successful. Remaining credit balance: " + strconv.Itoa(currentUser.Credits)
+	c.JSON(http.StatusOK, gin.H{"message": str})
+}
+
+type BuyCreditsInput struct {
+	Credits int `json:"credits" binding:"required"`
+}
+
+func BuyCredits(c *gin.Context) {
+	currentUser := c.MustGet("user").(*models.User)
+
+	var input BuyCreditsInput
+
+	if err := c.ShouldBind(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	currentUser.Credits += input.Credits
+
+	transaction := models.Transaction{
+		UserID:         currentUser.ID,
+		Amount:         int64(input.Credits),
+		Status:         "completed",
+		PaymentMethod:  "UPI",
+		CreditPurchase: true,
+	}
+
+	if err := database.DB.Create(&transaction).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction."})
+		return
+	}
+
+	if err := database.DB.Save(&currentUser).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add credits."})
+		return
+	}
+
+	str := "Credits added! Current balance: " + strconv.Itoa(currentUser.Credits)
+	c.JSON(http.StatusOK, gin.H{"message": str})
 }
