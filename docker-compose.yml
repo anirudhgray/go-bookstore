@@ -23,6 +23,8 @@ services:
       - postgres_db
     links:
       - postgres_db:postgres_db
+    volumes:
+      - app_logs:/app_logs
     restart: on-failure
 
   nginx:
@@ -34,3 +36,4 @@ services:
 
 volumes:
   prod_postgres_data:
+  app_logs:

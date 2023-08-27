@@ -18,10 +18,10 @@ func init() {
 	logger.Formatter = &formatter{}
 
 	multiWriter := io.MultiWriter(os.Stdout, &lumberjack.Logger{
-		Filename:   "app.log", // Path to the log file
-		MaxSize:    50,        // Max size in megabytes before rotation
-		MaxBackups: 3,         // Number of log files to keep
-		MaxAge:     30,        // Days to keep log files
+		Filename:   "app_logs/app.log", // Path to the log file
+		MaxSize:    50,                 // Max size in megabytes before rotation
+		MaxBackups: 3,                  // Number of log files to keep
+		MaxAge:     30,                 // Days to keep log files
 	})
 
 	logger.SetOutput(multiWriter)

@@ -39,8 +39,10 @@ services:
       - postgres_db:postgres_db
     volumes:
       - .:/app
+      - app_logs:/app_logs
     restart: always
 
 volumes:
   dev_postgres_data:
   pgadmin_data:
+  app_logs:

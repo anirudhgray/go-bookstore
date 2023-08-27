@@ -87,7 +87,7 @@ func GetBooks(c *gin.Context) {
 
 	booksWithAvgRating := make([]BookWithAvgRating, 0)
 	for _, book := range books {
-		logger.Infof("%v %v", book.Name, book.CalculateAvgRating())
+		logger.Infof("%v %v\n", book.Name, book.CalculateAvgRating())
 
 		bookWithAvgRating := BookWithAvgRating{
 			Book:      book,
