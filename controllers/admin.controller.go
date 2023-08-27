@@ -187,7 +187,6 @@ func DeleteBookHard(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
 		return
 	}
-	// TODO goddamn this leaves me open to sqli https://gorm.io/docs/security.html
 
 	if err := database.DB.First(&book, bookID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})

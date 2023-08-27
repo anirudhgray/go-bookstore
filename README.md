@@ -70,7 +70,7 @@ Currently logging to a local logfile.
 # Recommendation Engine
 I will be implementing a simple collaborative filtering based recommendations engine. Ref: https://www.toptal.com/algorithms/predicting-likes-inside-a-simple-recommendation-engine
 
-The general idea is that we will not care about the specific attributes of books, and then using some sort of ML Algorithm to figure out what kind of books our user will like (using the user's existing library, reviews, etc etc). Instead, our system will look **similarities** between users.
+The general idea is that we will not care about the specific attributes of books, and then use some sort of ML Algorithm to figure out what kind of books our user will like (using the user's existing library, reviews, etc etc). Instead, our system will look **similarities** between users.
 
 We keep a record of each user's likes and dislikes (let's base this on review rating — maybe 4 or 5 is "like", everything else is "dislike"). These are two sets that exist for every user. We're going to use something called the [Jaccard Coefficient](https://en.wikipedia.org/wiki/Jaccard_index) to calculate how similar two such sets are. For example, two duplicate sets will be completely similar (coeff of 1) while two sets with nothing in common will have a coeff of 0 (no similarity or overlap between the sets).
 
@@ -88,7 +88,9 @@ We keep a record of each user's likes and dislikes (let's base this on review ra
    4. Denominator is simply the total number of users of liked or disliked the item.
 6. Now we can rank the items based on this calculated probability, and give X number of recommendations.
 ### Caveats
-I'm thinking I'll do all this in-memory. Like, user wants reccs => I do all of the above and return some reccs. Maybe a better way to handle this would be to use something like Redis which apparently has nice features to work with sets, and generate reccs periodically. Also, a major issue with collaborative filtering is that of "cold start" — since this method relies on other similar users, what do you do for the first few users?
+- I'm thinking I'll do all this in-memory. Like, user wants reccs => I do all of the above and return some reccs. Maybe a better way to handle this would be to use something like Redis which apparently has nice features to work with sets, and generate reccs periodically. 
+- Also, a major issue with collaborative filtering is that of "cold start" — since this method relies on other similar users, what do you do for the first few users?
+- I am currently doing a basic like/dislike thing. However, since my ratings are on a scale of 1-5 I should make use of that (by giving more weight to a 5 than a 4, instead of treating both as equal likes).
 # Where I ran into issues:
 - Did not initially realise that gorm's auto-migrations do not, in fact, drop unused columns. While it does make sense as a default so that we don't lose data... well, anyway, spent some time trying to debug why my many2many join table had an unrelated column in it. Ended up dropping the table and then running migrations, will make sure to use my own migration scripts or a more full fledged library like goose.
 - Needed to enter associations mode to delete properly, otherwise only the reference would be yeeted.

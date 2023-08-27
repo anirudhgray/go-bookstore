@@ -57,6 +57,7 @@ func RegisterRoutes(route *gin.Engine) {
 	books := v1.Group("/books")
 	{
 		books.Use(middleware.BaseAuthMiddleware())
+		books.GET("/recommend", controllers.GenerateRecommendations)
 		books.GET("/catalog", controllers.GetBooks)
 		books.GET("/catalog/:bookID", controllers.GetBook)
 		books.GET("/catalog/:bookID/download", controllers.DownloadBook)
