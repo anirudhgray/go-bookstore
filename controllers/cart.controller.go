@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
+	"github.com/anirudhgray/balkan-assignment/infra/logger"
 	"github.com/anirudhgray/balkan-assignment/models"
 	"github.com/gin-gonic/gin"
 )
@@ -34,7 +34,7 @@ func AddBookToCart(c *gin.Context) {
 
 	var cart models.ShoppingCart
 	if err := database.DB.Model(&cart).Preload("Books").First(&cart, "user_id = ?", currentUser.ID).Error; err != nil {
-		fmt.Println(err)
+		logger.Errorf(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch shopping cart"})
 		return
 	}
@@ -48,7 +48,7 @@ func AddBookToCart(c *gin.Context) {
 
 	var library models.UserLibrary
 	if err := database.DB.Model(&library).Preload("Books").First(&library, "user_id = ?", currentUser.ID).Error; err != nil {
-		fmt.Println(err)
+		logger.Errorf(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user library"})
 		return
 	}

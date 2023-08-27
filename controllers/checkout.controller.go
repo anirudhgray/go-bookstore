@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
+	"github.com/anirudhgray/balkan-assignment/infra/logger"
 	"github.com/anirudhgray/balkan-assignment/models"
 	"github.com/gin-gonic/gin"
 )
@@ -48,11 +49,13 @@ func Checkout(c *gin.Context) {
 	}
 
 	if err := database.DB.Create(&transaction).Error; err != nil {
+		logger.Errorf("DB: Error creating transaction: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction"})
 		return
 	}
 
 	if err := database.DB.Save(&currentUser).Error; err != nil {
+		logger.Errorf("DB: Error saving book to user library after transaction: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add book to library"})
 		return
 	}
@@ -92,11 +95,13 @@ func BuyCredits(c *gin.Context) {
 	}
 
 	if err := database.DB.Create(&transaction).Error; err != nil {
+		logger.Errorf("DB: Error creating credit transaction: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction."})
 		return
 	}
 
 	if err := database.DB.Save(&currentUser).Error; err != nil {
+		logger.Errorf("DB: Error adding credits to user: %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add credits."})
 		return
 	}

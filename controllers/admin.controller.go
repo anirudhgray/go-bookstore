@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -10,6 +9,7 @@ import (
 	"time"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
+	"github.com/anirudhgray/balkan-assignment/infra/logger"
 	"github.com/anirudhgray/balkan-assignment/models"
 	"github.com/gin-gonic/gin"
 	"github.com/wabarc/go-catbox"
@@ -80,7 +80,7 @@ func CreateBook(c *gin.Context) {
 
 	// Save the book to the database
 	if err := database.DB.Create(&book).Error; err != nil {
-		fmt.Print(err)
+		logger.Errorf(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create book"})
 		return
 	}
@@ -182,7 +182,7 @@ func DeleteReview(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete review"})
 		return
 	}
-
+	logger.Infof("Review %d deleted.\n", reviewID)
 	c.JSON(http.StatusOK, gin.H{"message": "Review deleted successfully"})
 }
 
