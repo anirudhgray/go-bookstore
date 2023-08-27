@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"mime/multipart"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strconv"
 	"time"
@@ -55,6 +56,11 @@ func CreateBook(c *gin.Context) {
 
 	url, err := catbox.New(nil).Upload(filePath)
 	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	if err := os.Remove(filePath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
