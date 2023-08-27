@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"io"
 	"net/http"
 	"strconv"
 	"strings"
@@ -12,7 +13,7 @@ import (
 )
 
 type BookWithAvgRating struct {
-	models.Book
+	Book      models.SafeBook
 	AvgRating float64
 }
 
@@ -29,7 +30,7 @@ func AttachCL(c *gin.Context) {
 // Filter by category,
 // Sort by price or newness
 func GetBooks(c *gin.Context) {
-	var books []models.Book
+	var books []models.SafeBook
 
 	query := database.DB.Model(&models.Book{})
 
@@ -99,7 +100,7 @@ func GetBooks(c *gin.Context) {
 }
 
 func GetBook(c *gin.Context) {
-	var book models.Book
+	var book models.SafeBook
 	id := c.Param("bookID")
 	bookID, err := strconv.Atoi(id)
 	if err != nil {
@@ -155,5 +156,26 @@ func DownloadBook(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "No pdf found. Contact support."})
 		return
 	}
-	c.File(book.FilePath)
+
+	// fetch file from cloud storage loc
+	res, err := http.Get(book.FilePath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Trouble with cloud storage."})
+		return
+	}
+	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		c.JSON(http.StatusBadGateway, gin.H{"error": "Failed to fetch remote file."})
+		return
+	}
+
+	c.Status(http.StatusOK)
+	_, err = io.Copy(c.Writer, res.Body)
+
+	// c.File(book.FilePath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
 }

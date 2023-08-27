@@ -61,7 +61,7 @@ Users can fuzzy search entire books catalog for title, author and/or category. T
 ### 10. Shopping Cart:
 Users can add any book not already purchased by them to their chopping cart. They can remove books from their cart as well. On checking out their cart, they "buy" all books in the cart, and those books get added to their library of bought books. A transaction record is created. The cart gets cleared of all books on a successful transaction.
 ### 11. User Library:
-Library of books bought by a user. The user can download any of them as many times as they want. Currently stored on server locally, will shift to GCP Buckets or AWS S3.
+Library of books bought by a user. The user can download any of them as many times as they want.
 ### 12. Reviews:
 Users can only review a book that they have bought (ie, which is in their library). Reviews have a comment, and a rating (which is used to calc avg rating for the book).
 ### 12. Logging with Retention (Rotating Log)
@@ -88,8 +88,8 @@ We keep a record of each user's likes and dislikes (let's base this on review ra
    4. Denominator is simply the total number of users of liked or disliked the item.
 6. Now we can rank the items based on this calculated probability, and give X number of recommendations.
 ### Caveats
-- I'm thinking I'll do all this in-memory. Like, user wants reccs => I do all of the above and return some reccs. Maybe a better way to handle this would be to use something like Redis which apparently has nice features to work with sets, and generate reccs periodically. 
-- Also, a major issue with collaborative filtering is that of "cold start" — since this method relies on other similar users, what do you do for the first few users?
+- Currently doing calculation in-memory. Like, user wants reccs => I do all of the above and return some reccs. Maybe a better way to handle this would be to use something like Redis which apparently has nice features to work with sets, and generate reccs periodically. 
+- Also, a major issue with collaborative filtering is that of "cold start" — since this method relies on other similar users, what do you do for the first few users? And you can't get any recommendations until you make a few likes/dislikes of your own, and books with no reviews cannot be recommended to any users. In such cases a hybrid approach involving this + a content based engine would be helpful.
 - I am currently doing a basic like/dislike thing. However, since my ratings are on a scale of 1-5 I should make use of that (by giving more weight to a 5 than a 4, instead of treating both as equal likes).
 # Where I ran into issues:
 - Did not initially realise that gorm's auto-migrations do not, in fact, drop unused columns. While it does make sense as a default so that we don't lose data... well, anyway, spent some time trying to debug why my many2many join table had an unrelated column in it. Ended up dropping the table and then running migrations, will make sure to use my own migration scripts or a more full fledged library like goose.

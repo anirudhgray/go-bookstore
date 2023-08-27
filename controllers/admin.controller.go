@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"mime/multipart"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -10,6 +11,7 @@ import (
 	"github.com/anirudhgray/balkan-assignment/infra/database"
 	"github.com/anirudhgray/balkan-assignment/models"
 	"github.com/gin-gonic/gin"
+	"github.com/wabarc/go-catbox"
 )
 
 type CreateBookInput struct {
@@ -33,14 +35,28 @@ func CreateBook(c *gin.Context) {
 		return
 	}
 
-	file, err := c.FormFile("pdf")
+	file, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	allowedFileExtensions := []string{"application/pdf", "application/epub+zip", "text/plain", "application/rtf"}
+	if !isFileTypeAllowed(file, allowedFileExtensions) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid file type. pdf, epub, txt and rtf only."})
+		return
+	}
+
 	filePath := filepath.Join("uploads", file.Filename)
+
 	if err := c.SaveUploadedFile(file, filePath); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	url, err := catbox.New(nil).Upload(filePath)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
@@ -53,7 +69,7 @@ func CreateBook(c *gin.Context) {
 		Price:         input.Price,
 		ISBN:          input.ISBN,
 		Category:      models.BookCategory(input.Category), // Convert string to enum value
-		FilePath:      filePath,
+		FilePath:      url,
 		CatalogDelete: false,
 	}
 
@@ -65,6 +81,19 @@ func CreateBook(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Book created successfully", "data": book})
+}
+
+func isFileTypeAllowed(file *multipart.FileHeader, allowedTypes []string) bool {
+	contentType := file.Header.Get("Content-Type")
+	fileExtension := filepath.Ext(file.Filename)
+
+	for _, allowedType := range allowedTypes {
+		if contentType == allowedType || fileExtension == allowedType {
+			return true
+		}
+	}
+
+	return false
 }
 
 type EditBookInput struct {
