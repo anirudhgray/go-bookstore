@@ -1,8 +1,11 @@
 package recommender
 
 import (
+	"fmt"
 	"math"
 	"sort"
+	"strconv"
+	"strings"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
 	"github.com/anirudhgray/balkan-assignment/models"
@@ -79,6 +82,16 @@ func GetUsersWithSimilarInteractions(likedBooks []uint, dislikedBooks []uint, us
 	return resultUsers, nil
 }
 
+func formatFloat(num float64, prc int) string {
+	var (
+		zero, dot = "0", "."
+
+		str = fmt.Sprintf("%."+strconv.Itoa(prc)+"f", num)
+	)
+
+	return strings.TrimRight(strings.TrimRight(str, zero), dot)
+}
+
 // S(U1, U2) = (|L1 intersec L2| + |D1 intersect D2| - |L1 intersect D2| - |L2 intersect D1|) / |L1 union L2 union D1 union D2|
 func CalculateUserSimilarity(currentUserLiked, currentUserDisliked, otherUserLiked, otherUserDisliked []uint) float64 {
 	L1, L2, D1, D2 := currentUserLiked, otherUserLiked, currentUserDisliked, otherUserDisliked
@@ -91,9 +104,15 @@ func CalculateUserSimilarity(currentUserLiked, currentUserDisliked, otherUserLik
 	numerator := float64(L1IntersectL2Size + D1IntersectD2Size - L1IntersectD2Size - L2IntersectD1Size)
 	denominator := float64(unionSize4(L1, L2, D1, D2))
 
+	if numerator == 0 {
+		return 0
+	}
+
 	similarity := numerator / denominator
 
-	return similarity
+	res, _ := strconv.ParseFloat(formatFloat(similarity, 3), 64)
+
+	return res
 }
 
 func intersectionSize(set1, set2 []uint) int {

@@ -65,7 +65,7 @@ Library of books bought by a user. The user can download any of them as many tim
 ### 12. Reviews:
 Users can only review a book that they have bought (ie, which is in their library). Reviews have a comment, and a rating (which is used to calc avg rating for the book).
 ### 12. Logging with Retention (Rotating Log)
-Currently logging to a local logfile.
+Currently logging to a local rotating logfile. Logs are persisted on prod by mounting a docker volume for them (app_logs).
 ### 13. Reverse Proxy on prod using nginx.
 # Recommendation Engine
 I will be implementing a simple collaborative filtering based recommendations engine. Ref: https://www.toptal.com/algorithms/predicting-likes-inside-a-simple-recommendation-engine
@@ -102,7 +102,6 @@ We keep a record of each user's likes and dislikes (let's base this on review ra
 ├── Dockerfile-dev
 ├── Makefile
 ├── README.md
-├── app.log
 ├── config
 │   ├── config.go
 │   ├── db.go
@@ -113,15 +112,18 @@ We keep a record of each user's likes and dislikes (let's base this on review ra
 │   ├── books.controller.go
 │   ├── cart.controller.go
 │   ├── checkout.controller.go
+│   ├── recommendations.controller.go
 │   ├── review.controller.go
 │   └── user.controller.go
 ├── docker-compose-dev.yml
-├── docker-compose-prod.yml
+├── docker-compose.yml
+├── docs
+│   ├── docs.go
+│   ├── swagger.json
+│   └── swagger.yaml
+├── erd.png
 ├── go.mod
 ├── go.sum
-├── helpers
-│   ├── response.go
-│   └── search.go
 ├── infra
 │   ├── database
 │   │   └── database.go
@@ -140,24 +142,24 @@ We keep a record of each user's likes and dislikes (let's base this on review ra
 │   ├── user.model.go
 │   ├── user_library.model.go
 │   └── verification.model.go
+├── nginx
+│   ├── Dockerfile
+│   └── nginx.conf
 ├── routers
 │   ├── index.go
 │   ├── middleware
 │   │   ├── auth.middleware.go
 │   │   └── cors.go
 │   └── router.go
-├── tests
-│   └── auth.utils_test.go
-├── tmp
-│   ├── build-errors.log
-│   └── main
-├── uploads
-│   └── resume_anirudh.pdf
 └── utils
     ├── auth
-    │   └── auth.go
+    │   ├── auth.go
+    │   └── auth_test.go
     ├── email
     │   └── email.go
+    ├── recommender
+    │   ├── recommender.go
+    │   └── recommender_test.go
     └── token
         └── token.go
 ```
