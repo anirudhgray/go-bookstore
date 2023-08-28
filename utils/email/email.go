@@ -62,7 +62,7 @@ func GenericSendMail(subject string, content string, toEmail string, userName st
 
 	jsonData, err := json.Marshal(data)
 	if err != nil {
-		logger.Errorf("Error: %v", err)
+		logger.Errorf("Email Error: %v", err)
 		return err
 	}
 
@@ -70,7 +70,7 @@ func GenericSendMail(subject string, content string, toEmail string, userName st
 	req, err := http.NewRequest(method, url, bytes.NewBuffer(jsonData))
 
 	if err != nil {
-		logger.Errorf("Error: %v", err)
+		logger.Errorf("Email Error: %v", err)
 		return err
 	}
 
@@ -80,7 +80,7 @@ func GenericSendMail(subject string, content string, toEmail string, userName st
 
 	res, err := client.Do(req)
 	if err != nil {
-		logger.Errorf("Error: %v", err)
+		logger.Errorf("Email Error: %v", err)
 		return err
 	}
 	defer res.Body.Close()

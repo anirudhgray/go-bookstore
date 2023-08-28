@@ -45,7 +45,8 @@ func Register(c *gin.Context) {
 
 	user := models.User{Name: input.Name, Email: input.Email, Password: input.Password}
 	if err := user.Associate(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		logger.Errorf("Associate New User Failed: " + err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error while creating your account."})
 		return
 	}
 	user.HashPassword()
@@ -59,12 +60,14 @@ func Register(c *gin.Context) {
 	}
 
 	if err := user.AttachCartAndLibrary(); err != nil {
+		logger.Errorf("Attaching Cart and Library: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
 		return
 	}
 
 	email.SendRegistrationMail("Account Verification.", "Please visit the following link to verify your account: ", user.Email, user.ID, user.Name, true)
 	c.JSON(http.StatusCreated, gin.H{"message": "User created. Verification email sent!"})
+	logger.Infof("New User Created.")
 }
 
 func RequestVerificationAgain(c *gin.Context) {
@@ -95,6 +98,7 @@ func RequestVerificationAgain(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Verification email sent to you again."})
+	logger.Infof("Verification requested again")
 }
 
 func ForgotPasswordRequest(c *gin.Context) {
@@ -114,6 +118,7 @@ func ForgotPasswordRequest(c *gin.Context) {
 	email.SendForgotPasswordMail(user.Email, user.ID, user.Name)
 
 	c.JSON(http.StatusOK, gin.H{"message": "Forgot Password mail sent."})
+	logger.Infof("Forgot password request")
 }
 
 type ForgotPasswordInput struct {
@@ -132,7 +137,7 @@ func SetNewPassword(c *gin.Context) {
 	otp := c.Query("otp")
 	var entry models.ForgotPassword
 	if result := database.DB.Where("email = ?", useremail).First(&entry); result.Error != nil {
-		logger.Errorf("Error while verifying: %v", result.Error)
+		logger.Errorf("Error while verifying: %v", result.Error.Error())
 		c.JSON(http.StatusForbidden, gin.H{"message": "Invalid deletion verification. Account NOT deleted."})
 		return
 	}
@@ -150,6 +155,7 @@ func SetNewPassword(c *gin.Context) {
 		user.HashPassword()
 
 		if err := database.DB.Save(&user).Error; err != nil {
+			logger.Errorf("Save user after forgot and new: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
 			return
 		}
@@ -192,6 +198,7 @@ func Login(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": token, "user": user})
+	logger.Infof("User login")
 }
 
 type ResetPasswordInput struct {
@@ -220,6 +227,7 @@ func ResetPassword(c *gin.Context) {
 	currentUser.HashPassword()
 
 	if err := database.DB.Save(&currentUser).Error; err != nil {
+		logger.Errorf("Update Password failed: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update password"})
 		return
 	}
@@ -234,14 +242,14 @@ func VerifyEmail(c *gin.Context) {
 	otp := c.Query("otp")
 	var entry models.VerificationEntry
 	if result := database.DB.Where("email = ?", email).First(&entry); result.Error != nil {
-		logger.Errorf("Error while verifying: %v", result.Error)
+		logger.Errorf("Error while verifying.")
 	}
 	if entry.OTP == otp {
 		var user models.User
 		database.DB.Where("email = ?", email).First(&user)
 		user.Verified = true
 		if result := database.DB.Save(&user); result.Error != nil {
-			logger.Errorf("Error while verifying: %v", result.Error)
+			logger.Errorf("Verification: " + result.Error.Error())
 			return
 		}
 		var verificationEntry models.VerificationEntry
@@ -288,20 +296,24 @@ func DeleteAccount(c *gin.Context) {
 		database.DB.Where("email = ?", email).Preload("UserLibrary").Preload("ShoppingCart").First(&user)
 
 		if err := database.DB.Model(&user.UserLibrary).Association("Books").Clear(); err != nil {
+			logger.Errorf("Delete Acc: Failed to clear library: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to clear."})
 			return
 		}
 		if err := database.DB.Model(&user.ShoppingCart).Association("Books").Clear(); err != nil {
+			logger.Errorf("Delete Acc: Failed to clear cart: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to clear."})
 			return
 		}
 		// Delete the user account along with associated data
 		if err := database.DB.Unscoped().Select("ShoppingCart", "UserLibrary", "UserReviews").Delete(&user).Error; err != nil {
+			logger.Errorf("Delete Acc: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user account"})
 			return
 		}
 		// database.DB.Where("email = ?", user.Email).Delete(&models.DeletionConfirmation{})
 		c.JSON(http.StatusOK, gin.H{"message": "Account deleted successfully."})
+		logger.Infof("Account deleted")
 		return
 	}
 

@@ -49,13 +49,13 @@ func Checkout(c *gin.Context) {
 	}
 
 	if err := database.DB.Create(&transaction).Error; err != nil {
-		logger.Errorf("DB: Error creating transaction: %v\n", err)
+		logger.Errorf("DB: Error creating transaction: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction"})
 		return
 	}
 
 	if err := database.DB.Save(&currentUser).Error; err != nil {
-		logger.Errorf("DB: Error saving book to user library after transaction: %v\n", err)
+		logger.Errorf("DB: Error saving book to user library after transaction: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add book to library"})
 		return
 	}
@@ -68,6 +68,7 @@ func Checkout(c *gin.Context) {
 
 	str = "Checkout successful. Remaining credit balance: " + strconv.Itoa(currentUser.Credits)
 	c.JSON(http.StatusOK, gin.H{"message": str})
+	logger.Infof("%d Credits Used on Catalog")
 }
 
 type BuyCreditsInput struct {
@@ -95,17 +96,18 @@ func BuyCredits(c *gin.Context) {
 	}
 
 	if err := database.DB.Create(&transaction).Error; err != nil {
-		logger.Errorf("DB: Error creating credit transaction: %v\n", err)
+		logger.Errorf("DB: Error creating credit transaction: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create transaction."})
 		return
 	}
 
 	if err := database.DB.Save(&currentUser).Error; err != nil {
-		logger.Errorf("DB: Error adding credits to user: %v\n", err)
+		logger.Errorf("DB: Error adding credits to user: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add credits."})
 		return
 	}
 
 	str := "Credits added! Current balance: " + strconv.Itoa(currentUser.Credits)
 	c.JSON(http.StatusOK, gin.H{"message": str})
+	logger.Infof("%d Credits Purchased", input.Credits)
 }

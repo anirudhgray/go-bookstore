@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/anirudhgray/balkan-assignment/infra/database"
+	"github.com/anirudhgray/balkan-assignment/infra/logger"
 	"github.com/anirudhgray/balkan-assignment/models"
 	"github.com/gin-gonic/gin"
 )
@@ -52,6 +53,7 @@ func AddReview(c *gin.Context) {
 		existingReview.Comment = review.Comment
 		existingReview.Rating = review.Rating
 		if err := database.DB.Save(&existingReview).Error; err != nil {
+			logger.Errorf("DB: Review Update: " + err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update review"})
 			return
 		}
@@ -61,6 +63,7 @@ func AddReview(c *gin.Context) {
 
 	// Create a new review
 	if err := database.DB.Create(&review).Error; err != nil {
+		logger.Errorf("DB: Review Creation: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to add review"})
 		return
 	}

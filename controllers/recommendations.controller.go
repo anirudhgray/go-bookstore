@@ -24,19 +24,19 @@ func GenerateRecommendations(c *gin.Context) {
 
 	otherUsers, err := recommender.GetUsersWithSimilarInteractions(likes, dislikes, userID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	similarities, err := recommender.CalculateSimilaritiesWithOtherUsers(userID, otherUsers, likes, dislikes)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	unreviewed, err := recommender.GetUnreviewedBooks(userID)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 

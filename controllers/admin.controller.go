@@ -31,13 +31,13 @@ func CreateBook(c *gin.Context) {
 
 	// Validate request data
 	if err := c.ShouldBind(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request body."})
 		return
 	}
 
 	file, err := c.FormFile("file")
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "No file attached."})
 		return
 	}
 
@@ -50,18 +50,21 @@ func CreateBook(c *gin.Context) {
 	filePath := filepath.Join("uploads", file.Filename)
 
 	if err := c.SaveUploadedFile(file, filePath); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		logger.Errorf("Temp saving uploaded file: " + err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error saving file."})
 		return
 	}
 
 	url, err := catbox.New(nil).Upload(filePath)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		logger.Errorf("Error uploading file to cloud: " + err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error saving file."})
 		return
 	}
 
 	if err := os.Remove(filePath); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		logger.Errorf("Error cleaning up temp file: " + err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error saving file."})
 		return
 	}
 
@@ -143,6 +146,7 @@ func EditBook(c *gin.Context) {
 func GetAllTransactions(c *gin.Context) {
 	var transactions []models.Transaction
 	if err := database.DB.Preload("Books").Find(&transactions).Error; err != nil {
+		logger.Errorf("Fetch all transactions: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch all transactions for admin"})
 		return
 	}
@@ -156,6 +160,7 @@ func GetAllUsers(c *gin.Context) {
 
 	// Fetch all users from the database
 	if err := database.DB.Find(&users).Error; err != nil {
+		logger.Errorf("Fetch all users: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
 		return
 	}
@@ -182,7 +187,7 @@ func DeleteReview(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete review"})
 		return
 	}
-	logger.Infof("Review %d deleted.\n", reviewID)
+	logger.Infof("Review %d deleted.", reviewID)
 	c.JSON(http.StatusOK, gin.H{"message": "Review deleted successfully"})
 }
 
@@ -209,6 +214,7 @@ func DeleteBook(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Book has been marked as deleted"})
+	logger.Infof("Book %d deleted.", bookID)
 }
 
 // DeleteBookHard deletes a book from user libraries as well. Do not use unless necessary.
@@ -257,6 +263,7 @@ func BanUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "User ban status changed successfully"})
+	logger.Infof("User %d banned.", userID)
 }
 
 func PromoteUserToAdmin(c *gin.Context) {

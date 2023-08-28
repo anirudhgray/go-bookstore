@@ -42,10 +42,10 @@
 1. Clone the repo.
 2. Make sure you have docker/docker desktop installed, and a docker daemon running.
 3. Rename `sample.env` to `.env`, and set JWT signing secret (API_SECRET) with `openssl rand -hex 32`.
-4. For MAILTRAP_API_TOKEN, obtain a free api token from https://mailtrap.io/, or run the app without it (confirmation mails, etc, will not be sent in that case.)
+4. For MAILTRAP_API_TOKEN, obtain a free api token from https://mailtrap.io/, or run the app without it (confirmation mails, etc, will not be sent in that case).
 5. `make dev`
 6. App will be served at http://0.0.0.0:8000/ by default. Check http://0.0.0.0:8000/health to see if everything is OK on serverside.
-7. PG Admin will be served at http://0.0.0.0:5050/browser (only in development). Hostname: `postgres_db`, Username and Password as your env config.
+7. PG Admin will be served at http://0.0.0.0:5050/browser (only in development). Hostname: `postgres_db`, Username and Password as in your env config.
 8. API Docs at: https://documenter.getpostman.com/view/19697822/2s9Y5Wxifq
    
 # Features

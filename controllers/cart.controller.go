@@ -34,7 +34,7 @@ func AddBookToCart(c *gin.Context) {
 
 	var cart models.ShoppingCart
 	if err := database.DB.Model(&cart).Preload("Books").First(&cart, "user_id = ?", currentUser.ID).Error; err != nil {
-		logger.Errorf(err.Error())
+		logger.Errorf("Fetch cart: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch shopping cart"})
 		return
 	}
@@ -48,7 +48,7 @@ func AddBookToCart(c *gin.Context) {
 
 	var library models.UserLibrary
 	if err := database.DB.Model(&library).Preload("Books").First(&library, "user_id = ?", currentUser.ID).Error; err != nil {
-		logger.Errorf(err.Error())
+		logger.Errorf("Fetch library: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user library"})
 		return
 	}
@@ -79,6 +79,7 @@ func GetCart(c *gin.Context) {
 
 	var cart models.ShoppingCart
 	if err := database.DB.Model(&cart).Preload("Books").First(&cart, "user_id = ?", currentUser.ID).Error; err != nil {
+		logger.Errorf("Getting cart: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch shopping cart"})
 		return
 	}
@@ -99,17 +100,20 @@ func RemoveFromCart(c *gin.Context) {
 
 	var book models.Book
 	if err := database.DB.First(&book, bookID).Error; err != nil {
+		logger.Errorf("Removing from cart, fetch book: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch book"})
 		return
 	}
 
 	if err := database.DB.Model(&currentUser).Preload("ShoppingCart.Books").First(&currentUser).Error; err != nil {
+		logger.Errorf("Getting user, preload cart books: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch shopping cart"})
 		return
 	}
 
 	// for deletion of many to many association, need to use association mode. Doesn't do it automatically on
 	if err := database.DB.Model(&currentUser.ShoppingCart).Association("Books").Delete(book); err != nil {
+		logger.Errorf("Remove from cart: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to remove book from cart"})
 		return
 	}

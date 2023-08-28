@@ -81,13 +81,14 @@ func GetBooks(c *gin.Context) {
 	query = query.Where("catalog_delete = ?", false)
 
 	if err := query.Preload("Reviews").Find(&books).Error; err != nil {
+		logger.Errorf("Get all books: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch books"})
 		return
 	}
 
 	booksWithAvgRating := make([]BookWithAvgRating, 0)
 	for _, book := range books {
-		logger.Infof("%v %v\n", book.Name, book.CalculateAvgRating())
+		// logger.Infof("%v %v", book.Name, book.CalculateAvgRating())
 
 		bookWithAvgRating := BookWithAvgRating{
 			Book:      book,
@@ -153,6 +154,7 @@ func DownloadBook(c *gin.Context) {
 
 	// Send the file using c.File()
 	if book.FilePath == "" {
+		logger.Errorf("Book filepath not found: " + err.Error())
 		c.JSON(http.StatusNotFound, gin.H{"error": "No pdf found. Contact support."})
 		return
 	}
@@ -160,12 +162,14 @@ func DownloadBook(c *gin.Context) {
 	// fetch file from cloud storage loc
 	res, err := http.Get(book.FilePath)
 	if err != nil {
+		logger.Errorf("Accessing cloud storage: " + err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Trouble with cloud storage."})
 		return
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
+		logger.Errorf("Cloud storage not OK: " + err.Error())
 		c.JSON(http.StatusBadGateway, gin.H{"error": "Failed to fetch remote file."})
 		return
 	}
@@ -175,7 +179,8 @@ func DownloadBook(c *gin.Context) {
 
 	// c.File(book.FilePath)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		logger.Errorf("Sending fetched file to client: " + err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error sending file to client."})
 		return
 	}
 }
