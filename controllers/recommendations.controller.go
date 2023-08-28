@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/anirudhgray/balkan-assignment/models"
 	"github.com/anirudhgray/balkan-assignment/utils/recommender"
@@ -12,6 +13,8 @@ func GenerateRecommendations(c *gin.Context) {
 	currentUser, _ := c.Get("user")
 	user := currentUser.(*models.User)
 	userID := user.ID
+
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
 
 	likes, dislikes, err := recommender.GetUserLikesDislikes(userID)
 	if err != nil {
@@ -39,7 +42,7 @@ func GenerateRecommendations(c *gin.Context) {
 
 	recprobs := recommender.CalculateRecommendationProbabilities(userID, unreviewed, similarities)
 
-	recommendedBooks := recommender.GetRecommendedBooksSortedAndPaginated(recprobs, 1, 20)
+	recommendedBooks := recommender.GetRecommendedBooksSortedAndPaginated(recprobs, page, 20)
 
 	c.JSON(http.StatusOK, gin.H{"recommendations": recommendedBooks})
 }

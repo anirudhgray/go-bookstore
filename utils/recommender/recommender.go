@@ -293,7 +293,7 @@ func GetUsersWhoDislikedBook(bookID uint) ([]uint, error) {
 }
 
 type Recommendation struct {
-	Book        models.Book
+	Book        models.SafeBook
 	Probability float64
 }
 
@@ -301,8 +301,8 @@ func GetRecommendedBooksSortedAndPaginated(recommendationProbabilities map[uint]
 	var recommendations []Recommendation
 
 	for bookID, probability := range recommendationProbabilities {
-		var book models.Book
-		database.DB.First(&book, bookID)
+		var book models.SafeBook
+		database.DB.Model(&models.Book{}).First(&book, bookID)
 		recommendations = append(recommendations, Recommendation{
 			Book:        book,
 			Probability: probability,
@@ -318,5 +318,8 @@ func GetRecommendedBooksSortedAndPaginated(recommendationProbabilities map[uint]
 	startIdx := (page - 1) * perPage
 	endIdx := int(math.Min(float64(startIdx+perPage), float64(len(recommendations))))
 
-	return recommendations[startIdx:endIdx]
+	if startIdx < len(recommendations) {
+		return recommendations[startIdx:endIdx]
+	}
+	return []Recommendation{}
 }
