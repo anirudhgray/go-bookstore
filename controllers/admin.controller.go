@@ -318,3 +318,26 @@ func DemoteUserToBase(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"message": "Specified user is now a base user."})
 }
+
+func ManualVerification(c *gin.Context) {
+	id := c.Param("id")
+	userID, err := strconv.Atoi(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "400"})
+		return
+	}
+
+	var user models.User
+	if err := database.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	user.Verified = true
+	if err := database.DB.Save(&user).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to verify user"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User verified successfully"})
+}

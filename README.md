@@ -4,6 +4,14 @@
 - API baseurl: http://bookstore.anrdhmshr.tech/api/v1
 - Health Check: http://bookstore.anrdhmshr.tech/api/health
 - API Docs: https://documenter.getpostman.com/view/19697822/2s9Y5Wxifq
+
+**Test Credentials** to access Deployed Api (you can make your own account as well — will need a valid email):
+```
+{
+    "email": "testuser@anrdhmshr.com",
+    "password": "Testpwd@111"
+}
+```
 # Table of Contents
 - [Deployed Links](#deployed-links)
 - [Table of Contents](#table-of-contents)
@@ -13,16 +21,16 @@
     - [2. Access Control:](#2-access-control)
     - [3. Secure Password Reset Flow:](#3-secure-password-reset-flow)
     - [4. Forgot Password.](#4-forgot-password)
-    - [5. Acc Deactivation:](#5-acc-deactivation)
-    - [6. Acc Deletion:](#6-acc-deletion)
+    - [6. Account Deletion:](#6-account-deletion)
     - [7. Admin:](#7-admin)
     - [8. SuperAdmin:](#8-superadmin)
     - [9. Books Catalog:](#9-books-catalog)
     - [10. Shopping Cart:](#10-shopping-cart)
-    - [11. User Library:](#11-user-library)
-    - [12. Reviews:](#12-reviews)
-    - [12. Logging with Retention (Rotating Log)](#12-logging-with-retention-rotating-log)
-    - [13. Reverse Proxy on prod using nginx.](#13-reverse-proxy-on-prod-using-nginx)
+    - [13. Credits](#13-credits)
+    - [12. User Library:](#12-user-library)
+    - [13. Reviews:](#13-reviews)
+    - [14. Logging with Retention (Rotating Log)](#14-logging-with-retention-rotating-log)
+    - [15. Reverse Proxy on prod using nginx.](#15-reverse-proxy-on-prod-using-nginx)
 - [Recommendation Engine](#recommendation-engine)
     - [Rough flow for giving users recommendations:](#rough-flow-for-giving-users-recommendations)
     - [Caveats](#caveats)
@@ -44,14 +52,19 @@
 ### 1. Auth/User: 
 JWT Auth. Role Based (Base User and Admin) access to resources. Hashed Password. Password Strength Check. After implementing my registration controllers I realised that a more secure way to do it would have been by asking users to first specify an email, confirm that email, and then ask them to set a password. This would guard against user enumeration attacks. Right now, I'm guarding against it by essentially lying — I say that the confirmation email got sent if you try making an account with an existing email. This could be confusing, however, if the user has genuinely forgotten if they had an account associated with a particular email or not. Alternatively, I could send a warning email in such cases.
 ### 2. Access Control:
-setup doesn't seem too complex (base user and admin), so will not use a library like casbin.
+There is router auth middleware which handles access for the 3 user types: base, admin and superadmin.
 ### 3. Secure Password Reset Flow:
 Require current and new password. On change, mail email associated with user about the change ("If this was not you, we request you to change your password via the Email-based forgot password option"). On failure to reset password due to incorrect current password, mail associated email about attempt (in case it was a malicious use trying to transfer ownership).
 ### 4. Forgot Password.
-### 5. Acc Deactivation:
-(Not implemented) The user's profile is no longer accessible. User's name in their comments is replaced by "Generic User". All user data is retained (such as comment contents, shopping cart, wishlists, purchased books, etc) and restored on next login.
-### 6. Acc Deletion:
-The user's profile is no longer accessible. User can request an account deletion, and will then recieve a confirmation email, with a link to complete the process. The process must be completed within a set amount of time.
+An OTP is sent to the registered email acount, and is valid for 3 minutes.
+```
+From: BOOKSTORE ADMIN test@anrdhmshr.tech Subject: Forgot Password.
+Date: 28 August 2023 at 15:57
+To: Anirudh Gray anirudhgray@gmail.com
+A forgot password request was made for the email associated with your account. If this was not you, feel free to ignore this email. Otherwise, click on this link to post your new password: http://0.0.0.0:8000/v1/auth/set-forgotten-password? email=anirudh04mishra@gmail.com&otp=255610 . This link will be active for 3 minutes.
+```
+### 6. Account Deletion:
+The user's profile is no longer accessible. User can request an account deletion, and will then recieve a confirmation email, with an OTP and a link to complete the process. The process must be completed within a set amount of time (3 minutes).
 ### 7. Admin:
 Admin users can add books to the catalog, as well as edit their details. In addition, they can delete reviews and books. They can also ban users (essentially, deactivate plus ban boolean). Deleting books should ordinarily NOT remove it from libraries of users who have already purchased it.
 ### 8. SuperAdmin:
@@ -59,16 +72,20 @@ By default, if there are no admins in the database, the next user who signs up i
 ### 9. Books Catalog:
 Users can fuzzy search entire books catalog for title, author and/or category. They can filter by category, and sort by price.
 ### 10. Shopping Cart:
-Users can add any book not already purchased by them to their chopping cart. They can remove books from their cart as well. On checking out their cart, they "buy" all books in the cart, and those books get added to their library of bought books. A transaction record is created. The cart gets cleared of all books on a successful transaction.
-### 11. User Library:
+Users can add any book not already purchased by them to their chopping cart. They can remove books from their cart as well. On checking out their cart, they "buy" all books in the cart, and those books get added to their library of bought books. A transaction record is created for admin audit purposes. The cart gets cleared of all books on a successful transaction.
+### 13. Credits
+Users need credits to buy books. They can purchase credits (a transaction record is created for this as well).
+### 12. User Library:
 Library of books bought by a user. The user can download any of them as many times as they want.
-### 12. Reviews:
-Users can only review a book that they have bought (ie, which is in their library). Reviews have a comment, and a rating (which is used to calc avg rating for the book).
-### 12. Logging with Retention (Rotating Log)
+### 13. Reviews:
+Users can only review a book that they have bought (ie, which is in their library). Reviews have a comment, and a rating (which is used to calc avg rating for the book, and for generating recommendations).
+### 14. Logging with Retention (Rotating Log)
 Currently logging to a local rotating logfile. Logs are persisted on prod by mounting a docker volume for them (app_logs).
-### 13. Reverse Proxy on prod using nginx.
+### 15. Reverse Proxy on prod using nginx.
 # Recommendation Engine
-I will be implementing a simple collaborative filtering based recommendations engine. Ref: https://www.toptal.com/algorithms/predicting-likes-inside-a-simple-recommendation-engine
+> **Note**: If you're trying this out with a new user, note that you will not get any recommendations. Review a few books, and then you'll be able to get recommendations — this is because of the "cold start" issue in my implementation (explained below).
+
+I have implemented a simple collaborative filtering based recommendations engine. Ref: https://www.toptal.com/algorithms/predicting-likes-inside-a-simple-recommendation-engine
 
 The general idea is that we will not care about the specific attributes of books, and then use some sort of ML Algorithm to figure out what kind of books our user will like (using the user's existing library, reviews, etc etc). Instead, our system will look **similarities** between users.
 
@@ -167,8 +184,9 @@ We keep a record of each user's likes and dislikes (let's base this on review ra
 - `models/`: The model structs for each table in my DB, along with their relations.
 - `controllers/`: Combined handlers for each route, along with controllers for the business logic, as well as data accessing repository functions.
 - `routers/`: API routes and auth+cors middleware.
-- `utils/`: Reusable utility functions for business logic in controllers. Eg, for mailing, password validation, etc.
+- `utils/`: Reusable utility functions for business logic in controllers. Eg, for mailing, password validation, the recommender system etc.
 - `config/`: Initial reading in config from .env, setting up server and DB configurations.
 ## ERD
-**Note:** This does not show 1:1 relations properly (shown as 1:N). Will update.
+> **Note:** This does not show 1:1 relations properly (shown as 1:N). Will update.
+
 ![erd](erd.png)

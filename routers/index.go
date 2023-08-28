@@ -39,6 +39,7 @@ func RegisterRoutes(route *gin.Engine) {
 		// implement some sort of admin dashboard statistics thing here?
 		admin.GET("/users", controllers.GetAllUsers)
 		admin.POST("/users/:userID", controllers.BanUser)
+		admin.POST("/verify/user/:id", controllers.ManualVerification)
 		admin.POST("/books", controllers.CreateBook)
 		admin.PATCH("/books/:id", controllers.EditBook)
 		admin.GET("/transactions", controllers.GetAllTransactions)
