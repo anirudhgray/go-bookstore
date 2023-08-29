@@ -44,5 +44,12 @@ func GenerateRecommendations(c *gin.Context) {
 
 	recommendedBooks := recommender.GetRecommendedBooksSortedAndPaginated(recprobs, page, 20)
 
-	c.JSON(http.StatusOK, gin.H{"recommendations": recommendedBooks})
+	var message string
+	if len(recommendedBooks) > 0 {
+		message = "Here are some recommendations for you."
+	} else {
+		message = "Could not get any recommendations for you. Maybe try looking at our catalog for now? Check out the recs section on the readme for more info on this."
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": message, "recommendations": recommendedBooks})
 }
