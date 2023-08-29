@@ -317,6 +317,11 @@ func DemoteUserToBase(c *gin.Context) {
 		return
 	}
 
+	if user.Role == models.SuperAdmin {
+		c.JSON(http.StatusTeapot, gin.H{"error": "You can't demote another super admin!"})
+		return
+	}
+
 	user.Role = models.BaseUser
 	if err := database.DB.Save(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update user"})

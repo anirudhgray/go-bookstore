@@ -31,10 +31,11 @@
     - [13. Reviews:](#13-reviews)
     - [14. Logging with Retention (Rotating Log)](#14-logging-with-retention-rotating-log)
     - [15. Reverse Proxy on prod using nginx.](#15-reverse-proxy-on-prod-using-nginx)
+    - [16. Security](#16-security)
 - [Recommendation Engine](#recommendation-engine)
     - [Rough flow for giving users recommendations:](#rough-flow-for-giving-users-recommendations)
     - [Caveats](#caveats)
-- [Where I ran into issues:](#where-i-ran-into-issues)
+- [Where I ran into issues (aka, Gorm):](#where-i-ran-into-issues-aka-gorm)
 - [Project Structure](#project-structure)
   - [Explanation](#explanation)
   - [ERD](#erd)
@@ -80,8 +81,11 @@ Library of books bought by a user. The user can download any of them as many tim
 ### 13. Reviews:
 Users can only review a book that they have bought (ie, which is in their library). Reviews have a comment, and a rating (which is used to calc avg rating for the book, and for generating recommendations).
 ### 14. Logging with Retention (Rotating Log)
-Currently logging to a local rotating logfile. Logs are persisted on prod by mounting a docker volume for them (app_logs).
+Currently logging to a local rotating logfile. Logs are persisted on prod by mounting a docker volume for them (app_logs). To access (will copy logs to ./logs dir on host system):
+`docker cp <SERVER_CONTAINER_ID>:/app_logs ./logs`
 ### 15. Reverse Proxy on prod using nginx.
+### 16. Security
+I am protecting against attacks like SQLI, and dependency graph revealed no major vulnerabilities with known exploits.
 # Recommendation Engine
 > **Note**: If you're trying this out with a new user, note that you will not get any recommendations. Review a few books, and then you'll be able to get recommendations — this is because of the "cold start" issue in my implementation (explained below).
 
@@ -108,10 +112,11 @@ We keep a record of each user's likes and dislikes (let's base this on review ra
 - Currently doing calculation in-memory. Like, user wants reccs => I do all of the above and return some reccs. Maybe a better way to handle this would be to use something like Redis which apparently has nice features to work with sets, and generate reccs periodically. 
 - Also, a major issue with collaborative filtering is that of "cold start" — since this method relies on other similar users, what do you do for the first few users? And you can't get any recommendations until you make a few likes/dislikes of your own, and books with no reviews cannot be recommended to any users. In such cases a hybrid approach involving this + a content based engine would be helpful.
 - I am currently doing a basic like/dislike thing. However, since my ratings are on a scale of 1-5 I should make use of that (by giving more weight to a 5 than a 4, instead of treating both as equal likes).
-# Where I ran into issues:
+# Where I ran into issues (aka, Gorm):
 - Did not initially realise that gorm's auto-migrations do not, in fact, drop unused columns. While it does make sense as a default so that we don't lose data... well, anyway, spent some time trying to debug why my many2many join table had an unrelated column in it. Ended up dropping the table and then running migrations, will make sure to use my own migration scripts or a more full fledged library like goose.
 - Needed to enter associations mode to delete properly, otherwise only the reference would be yeeted.
 - The whole flow of user deletion. The culprit? Gorm, yet again.
+- Overall, gorm seems like a pain. Unfortunately, I also made the poor design choice of having my data layer logic in my business logic controllers — using a "repository pattern" would have made it easier to switch out to something else. Maybe a sql query builder like Squirrel instead of an ORM.
 # Project Structure
 ```
 .

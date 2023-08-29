@@ -45,12 +45,12 @@ func (user *User) BeforeDelete(tx *gorm.DB) error {
 func (user *User) Associate() error {
 	user.Email = html.EscapeString(strings.TrimSpace(user.Email))
 	user.Name = html.EscapeString(strings.TrimSpace(user.Name))
-	var adminCount int64
-	if err := database.DB.Model(&User{}).Where("role = ?", Admin).Count(&adminCount).Error; err != nil {
-		logger.Errorf("Failed to check for admin.")
+	var superAdminCount int64
+	if err := database.DB.Model(&User{}).Where("role = ?", SuperAdmin).Count(&superAdminCount).Error; err != nil {
+		logger.Errorf("Failed to check for super admin.")
 	}
 
-	if adminCount == 0 {
+	if superAdminCount == 0 {
 		user.Role = SuperAdmin
 	} else {
 		user.Role = BaseUser
