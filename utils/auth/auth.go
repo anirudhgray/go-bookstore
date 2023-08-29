@@ -9,6 +9,12 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// CheckPasswordStrength checks for the following:
+//   - min length 7
+//   - uppercase
+//   - lowercase
+//   - number
+//   - special character
 func CheckPasswordStrength(s string) bool {
 	var (
 		hasMinLen  = false
@@ -35,11 +41,13 @@ func CheckPasswordStrength(s string) bool {
 	return hasMinLen && hasUpper && hasLower && hasNumber && hasSpecial
 }
 
+// VerifyPassword checks plaintext password against a hashed one.
 func VerifyPassword(password, hashedPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))
 }
 
-func LoginCheck(email, password string) (string, models.User, error) {
+// LoginCheck checks validity of given email/password, and returns token in user exists and password is correct.
+func LoginCheck(email, password string) (t string, u models.User, e error) {
 	var err error
 
 	user := models.User{}

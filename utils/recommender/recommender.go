@@ -11,7 +11,9 @@ import (
 	"github.com/anirudhgray/balkan-assignment/models"
 )
 
-func GetUserLikesDislikes(userID uint) ([]uint, []uint, error) {
+// GetUserLikesDislikes retrieves the book IDs that a user has liked and disliked based on their review ratings.
+// It queries the database for reviews associated with the given user ID and categorizes the books into liked and disliked lists.
+func GetUserLikesDislikes(userID uint) (liked []uint, notLiked []uint, err error) {
 	var reviews []models.Review
 	result := database.DB.Where("user_id = ?", userID).Find(&reviews)
 	if result.Error != nil {
@@ -32,7 +34,9 @@ func GetUserLikesDislikes(userID uint) ([]uint, []uint, error) {
 	return likedBooks, notLikedBooks, nil
 }
 
-func GetUsersWhoReviewedBook(bookID uint) ([]uint, error) {
+// GetUsersWhoReviewedBook retrieves the user IDs of users who have reviewed a specific book.
+// It queries the database for reviews associated with the given book ID and returns the user IDs of users who have reviewed the book.
+func GetUsersWhoReviewedBook(bookID uint) (userslist []uint, err error) {
 	var reviews []models.Review
 	result := database.DB.Where("book_id = ?", bookID).Find(&reviews)
 	if result.Error != nil {
@@ -48,7 +52,9 @@ func GetUsersWhoReviewedBook(bookID uint) ([]uint, error) {
 	return users, nil
 }
 
-func GetUsersWithSimilarInteractions(likedBooks []uint, dislikedBooks []uint, userID uint) ([]uint, error) {
+// GetUsersWithSimilarInteractions retrieves user IDs who have interacted with books that are similar to the given user's liked and disliked books.
+// It queries the database for users who have reviewed books that match the liked and disliked books of the given user.
+func GetUsersWithSimilarInteractions(likedBooks []uint, dislikedBooks []uint, userID uint) (userslist []uint, err error) {
 	var users []uint
 
 	for _, bookID := range likedBooks {
@@ -92,8 +98,10 @@ func formatFloat(num float64, prc int) string {
 	return strings.TrimRight(strings.TrimRight(str, zero), dot)
 }
 
-// S(U1, U2) = (|L1 intersec L2| + |D1 intersect D2| - |L1 intersect D2| - |L2 intersect D1|) / |L1 union L2 union D1 union D2|
-func CalculateUserSimilarity(currentUserLiked, currentUserDisliked, otherUserLiked, otherUserDisliked []uint) float64 {
+// CalculateUserSimilarity of two users via modified Jaccard Coefficient.
+//
+//	S(U1, U2) = (|L1 intersec L2| + |D1 intersect D2| - |L1 intersect D2| - |L2 intersect D1|) / |L1 union L2 union D1 union D2|
+func CalculateUserSimilarity(currentUserLiked, currentUserDisliked, otherUserLiked, otherUserDisliked []uint) (similarityCoefficient float64) {
 	L1, L2, D1, D2 := currentUserLiked, otherUserLiked, currentUserDisliked, otherUserDisliked
 
 	L1IntersectL2Size := intersectionSize(currentUserLiked, otherUserLiked)
@@ -148,7 +156,8 @@ func unionSize4(arr1, arr2, arr3, arr4 []uint) int {
 	return len(unionSet)
 }
 
-func CalculateSimilaritiesWithOtherUsers(currentUserID uint, similarUsers []uint, currentUserLiked, currentUserDisliked []uint) (map[uint]float64, error) {
+// CalculateSimilaritiesWithOtherUsers returns a mapping of similar users (returned by GetUsersWithSimilarInteractions) to their similarity coefficient with current user.
+func CalculateSimilaritiesWithOtherUsers(currentUserID uint, similarUsers []uint, currentUserLiked, currentUserDisliked []uint) (sims map[uint]float64, err error) {
 	userSimilarities := make(map[uint]float64)
 
 	for _, otherUserID := range similarUsers {
@@ -164,6 +173,7 @@ func CalculateSimilaritiesWithOtherUsers(currentUserID uint, similarUsers []uint
 	return userSimilarities, nil
 }
 
+// GetUnreviewedBooks fetches books which the current user has not yet reviewed (will select recommendations from among these)
 func GetUnreviewedBooks(currentUserID uint) ([]uint, error) {
 	userLikedBooks, userDislikedBooks, err := GetUserLikesDislikes(currentUserID)
 	if err != nil {
@@ -199,7 +209,18 @@ func contains(arr []uint, item uint) bool {
 	return false
 }
 
-// P(U, B) = (ZL - ZD) / (|ML| + |MD|)
+// CalculateRecommendationProbabilities returns mapping on user's unreviewed books to the "probability" of them liking it (i.e., order of recommendation).
+//
+// ZL = sum of similarity coefficients of other similar users who have liked a particular book.
+//
+// ML = number of such users as above
+//
+// ZD = sum of similarity coefficients of other similar users who have disliked a particular book.
+//
+// MD = number of such users as above
+//
+//	P(U, B) = (ZL - ZD) / (|ML| + |MD|)
+//
 // Produces a value between -1 and 1
 func CalculateRecommendationProbabilities(currentUserID uint, unreviewedBooks []uint, similarUsers map[uint]float64) map[uint]float64 {
 	recommendationProbabilities := make(map[uint]float64)

@@ -89,7 +89,9 @@ I am protecting against attacks like SQLI, and dependency graph revealed no majo
 # Recommendation Engine
 > **Note**: If you're trying this out with a new user, note that you will not get any recommendations. Review a few books, and then you'll be able to get recommendations — this is because of the "cold start" issue in my implementation (explained below).
 
-I have implemented a simple collaborative filtering based recommendations engine. Ref: https://www.toptal.com/algorithms/predicting-likes-inside-a-simple-recommendation-engine
+I have implemented a simple collaborative filtering based recommendations engine. Ref: https://www.toptal.com/algorithms/predicting-likes-inside-a-simple-recommendation-engine.
+
+Implementation at: [Recommender Controller](/controllers/recommendations.controller.go) and [Recommender Utils](/utils/recommender/recommender.go)
 
 The general idea is that we will not care about the specific attributes of books, and then use some sort of ML Algorithm to figure out what kind of books our user will like (using the user's existing library, reviews, etc etc). Instead, our system will look **similarities** between users.
 
