@@ -109,7 +109,7 @@ func GetBook(c *gin.Context) {
 		return
 	}
 
-	if err := database.DB.Preload("Reviews").First(&book, bookID).Error; err != nil {
+	if err := database.DB.Model(&models.Book{}).Preload("Reviews").First(&book, bookID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Book not found"})
 		return
 	}
