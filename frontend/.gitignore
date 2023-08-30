@@ -1,0 +1,20 @@
+# Ignore compiled Go binaries and executables
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Ignore generated WebAssembly files
+*.wasm
+
+# Ignore build and generated files
+build/
+bin/
+web/
+
+# Ignore system and editor files
+.idea/
+.vscode/
+*.swp
+.DS_Store
