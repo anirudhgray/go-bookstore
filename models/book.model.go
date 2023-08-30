@@ -26,7 +26,7 @@ type Book struct {
 	Year          time.Time
 	Price         int64 `gorm:"not null"`
 	FilePath      string
-	ISBN          string          `gorm:"size:255;not null"`
+	ISBN          string          `gorm:"size:255;not null;unique"`
 	Category      BookCategory    `gorm:"not null"`
 	ShoppingCarts []*ShoppingCart `gorm:"many2many:cart_books;"`
 	UserLibraries []*UserLibrary  `gorm:"many2many:user_library_books;"`
