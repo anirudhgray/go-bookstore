@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/anirudhgray/balkan-assignment/frontend/src/components"
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 )
 
@@ -18,6 +19,11 @@ type Login struct {
 }
 
 func (l *Login) OnMount(ctx app.Context) {
+	var token string
+	ctx.LocalStorage().Get("token", &token)
+	if token != "" {
+		ctx.Navigate("/catalog")
+	}
 	ctx.ObserveState("error").Value(&l.err)
 }
 
@@ -60,22 +66,14 @@ func (l *Login) submit(ctx app.Context, e app.Event) {
 
 	ctx.LocalStorage().Set("token", m["token"])
 	ctx.LocalStorage().Set("user", m["user"])
-	// fmt.Println(res.Status)
-	// fmt.Println(string(responseBody))
+
+	ctx.Navigate("/catalog")
 }
 
 func (l *Login) Render() app.UI {
 	return app.Div().Class("bg-gray-400 p-10 min-h-screen flex flex-col").Body(
-		app.Div().Body(
-			app.Div().Body(
-				app.A().Body(
-					app.H1().Text("Secure Bookstore").Class("text-2xl font-bold"),
-				).Href("/"),
-				app.P().Text("Built using Golang and WASM"),
-			),
-			app.A().Class("bi bi-github text-4xl").Href("https://github.com/BalkanID-University/vit-2025-summer-engineering-internship-task-anirudhgray"),
-		).Class("flex justify-between max-w-[80rem] w-full mx-auto"),
-		app.H2().Text("Login").Class("text-4xl font-bold text-purple-900 mt-6 mb-6 xl:text-center"),
+		&components.Navbar{},
+		&components.Title{TitleString: "Login"},
 		app.Div().Body(
 			app.Div().Class("grid grid-cols-2").Body(
 				app.Form().Class("xl:col-span-2 md:col-span-1 col-span-2 max-w-[30rem] xl:mx-auto").Body(
@@ -89,6 +87,6 @@ func (l *Login) Render() app.UI {
 				// app.P().Text("Nice").Class("md:col-span-1 col-span-2"),
 			),
 		).Class("max-w-[80rem] xl:mx-auto"),
-		app.P().Text("Made by Anirudh Mishra").Class("mt-auto pt-6 text-center"),
+		&components.Footer{},
 	)
 }
