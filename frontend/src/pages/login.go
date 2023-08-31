@@ -24,7 +24,6 @@ func (l *Login) OnMount(ctx app.Context) {
 	if token != "" {
 		ctx.Navigate("/catalog")
 	}
-	ctx.ObserveState("error").Value(&l.err)
 }
 
 func (l *Login) submit(ctx app.Context, e app.Event) {
@@ -32,37 +31,37 @@ func (l *Login) submit(ctx app.Context, e app.Event) {
 	values := map[string]string{"email": l.email, "password": l.password}
 	jsonData, err := json.Marshal(values)
 	if err != nil {
-		ctx.SetState("error", err.Error())
+		l.err = err.Error()
 		return
 	}
 	req, err := http.NewRequest("POST", "/api/v1/auth/login", bytes.NewBuffer(jsonData))
 	if err != nil {
-		ctx.SetState("error", err.Error())
+		l.err = err.Error()
 		return
 	}
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
-		ctx.SetState("error", err.Error())
+		l.err = err.Error()
 		return
 	}
 	defer res.Body.Close()
 	responseBody, err := io.ReadAll(res.Body)
 	if err != nil {
-		ctx.SetState("error", err.Error())
+		l.err = err.Error()
 		return
 	}
 	if res.StatusCode >= 400 {
-		ctx.SetState("error", string(responseBody))
+		l.err = string(responseBody)
 		return
 	}
 	m := make(map[string]interface{})
 	err = json.Unmarshal(responseBody, &m)
 	if err != nil {
-		ctx.SetState("error", err.Error())
+		l.err = err.Error()
 		return
 	}
-	ctx.SetState("error", "")
+	l.err = ""
 
 	ctx.LocalStorage().Set("token", m["token"])
 	ctx.LocalStorage().Set("user", m["user"])
@@ -78,11 +77,16 @@ func (l *Login) Render() app.UI {
 			app.Div().Class("grid grid-cols-2").Body(
 				app.Form().Class("xl:col-span-2 md:col-span-1 col-span-2 max-w-[30rem] xl:mx-auto").Body(
 					app.Label().For("email").Text("Email"),
-					app.Input().ID("email").Class("w-full mb-3 py-1 px-2 rounded-md").Value(l.email).Placeholder("test@anrdhmshr.tech").OnChange(l.ValueTo(&l.email)),
+					app.Input().ID("email").Class("w-full mb-3 py-1 px-2 rounded-md").Type("email").Value(l.email).Placeholder("test@anrdhmshr.tech").OnChange(l.ValueTo(&l.email)),
 					app.Label().For("password").Text("Password"),
-					app.Input().ID("password").Class("w-full mb-3 py-1 px-2 rounded-md").Value(l.password).Placeholder("securePwd!0").OnChange(l.ValueTo(&l.password)),
+					app.Input().ID("password").Class("w-full mb-3 py-1 px-2 rounded-md").Value(l.password).Type("password").Placeholder("securePwd!0").OnChange(l.ValueTo(&l.password)),
 					app.Button().Text("Login").Class("px-3 py-2 bg-purple-500 hover:bg-purple-800 text-white rounded-md mt-6").OnClick(l.submit),
-					app.P().Text(l.err).Class("text-red-900 "+l.err),
+					app.P().Text(l.err).Class("text-red-900"),
+
+					app.Span().Body(
+						app.P().Text("Don't have an account?"),
+						app.A().Text("Register now.").Href("/register").Class("font-bold text-purple-600 hover:text-purple-800"),
+					).Class("flex gap-1 mt-4"),
 				),
 				// app.P().Text("Nice").Class("md:col-span-1 col-span-2"),
 			),
