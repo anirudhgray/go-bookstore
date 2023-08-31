@@ -87,6 +87,10 @@ func (l *Login) Render() app.UI {
 						app.P().Text("Don't have an account?"),
 						app.A().Text("Register now.").Href("/register").Class("font-bold text-purple-600 hover:text-purple-800"),
 					).Class("flex gap-1 mt-4"),
+					app.Span().Body(
+						app.P().Text("Oops."),
+						app.A().Text("Forgot password?").Href("/forgot").Class("font-bold text-purple-600 hover:text-purple-800"),
+					).Class("flex gap-1 mt-4"),
 				),
 				// app.P().Text("Nice").Class("md:col-span-1 col-span-2"),
 			),

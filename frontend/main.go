@@ -19,6 +19,8 @@ func main() {
 	app.Route("/", &pages.Landing{})
 	app.Route("/login", &pages.Login{})
 	app.Route("/register", &pages.Register{})
+	app.Route("/forgot", &pages.Forgot{})
+	app.Route("/verify", &pages.Verify{})
 	app.Route("/catalog", &pages.Catalog{})
 
 	// Once the routes set up, the next thing to do is to either launch the app
