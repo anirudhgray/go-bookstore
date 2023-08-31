@@ -1,0 +1,6 @@
+*.wasm
+/*.css
+/*.html
+/*.js
+/*.webmanifest
+frontend

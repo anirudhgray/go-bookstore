@@ -27,12 +27,23 @@ services:
       - app_logs:/app_logs
     restart: on-failure
 
+  frontend-builder:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app  # Mount the build directory to the container
+    command: sh -c "GOARCH=wasm GOOS=js go build -o web/app.wasm && go build -o frontend && ./frontend"
+
   nginx:
     build: "./nginx"
     ports:
       - "80:80"
     depends_on:
       - server
+    volumes:
+      - ./frontend:/usr/share/nginx/html/frontend
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
 
 volumes:
   prod_postgres_data:
