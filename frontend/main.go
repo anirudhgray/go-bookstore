@@ -27,7 +27,7 @@ type hello2 struct {
 // The Render method is where the component appearance is defined. Here, a
 // "Hello World!" is displayed as a heading.
 func (h *hello2) Render() app.UI {
-	return app.H1().Text("Hello again. Hahaha.")
+	return app.H1().Text("Hello again. Hahaha. Noish.")
 }
 
 // The main function is the entry point where the app is configured and started.

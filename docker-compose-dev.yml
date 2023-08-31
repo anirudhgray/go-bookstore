@@ -51,7 +51,6 @@ services:
     volumes:
       - ./frontend/build:/usr/share/nginx/html/frontend
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    restart: always
 
 volumes:
   dev_postgres_data:
