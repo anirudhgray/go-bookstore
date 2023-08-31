@@ -173,7 +173,8 @@ func SetNewPassword(c *gin.Context) {
 func Login(c *gin.Context) {
 	var input LoginInput
 
-	if err := c.ShouldBind(&input); err != nil {
+	if err := c.ShouldBindJSON(&input); err != nil {
+		logger.Errorf("login: %v", err.Error())
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

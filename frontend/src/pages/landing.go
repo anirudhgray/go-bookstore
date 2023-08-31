@@ -22,7 +22,7 @@ func (h *Landing) Render() app.UI {
 		app.Span().Body(
 			app.P().Text("Let's go, in and out. 20 minute adventure.").Class("italic text-sm"),
 			app.P().Text("- me, looking cheerfully at go and wasm earlier.").Class("text-sm"),
-		).Class("text-center"),
-		app.A().Text("Enter Bookstore").Class("px-3 py-2 bg-purple-500 hover:bg-purple-800 text-white rounded-md mt-6 max-w-full w-[20rem] text-center mx-auto").Href("/login"),
+		).Class("text-center mb-6"),
+		app.A().Text("Enter Bookstore").Class("px-3 py-2 bg-purple-500 hover:bg-purple-800 text-white rounded-md max-w-full block w-[20rem] text-center mt-6 mx-auto").Href("/login"),
 	)
 }
