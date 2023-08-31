@@ -74,14 +74,14 @@ func (v *Verify) submit(ctx app.Context, e app.Event) {
 }
 
 func (v *Verify) Render() app.UI {
-	return app.Div().Class("bg-gray-400 p-10 min-h-screen flex flex-col").Body(
+	return app.Div().Class("background p-10 min-h-screen flex flex-col").Body(
 		&components.Navbar{},
 		&components.Title{TitleString: "Account Verification"},
 		app.Div().Body(
 			app.Div().Class("grid grid-cols-2").Body(
 				app.Form().Class("xl:col-span-2 md:col-span-1 col-span-2 max-w-[30rem] xl:mx-auto").Body(
 					app.P().Text(v.email),
-					app.P().Text(v.otp),
+					// app.P().Text(v.otp),
 					app.Button().Disabled(v.loading).Text("Verify Me").Class("px-3 py-2 bg-purple-500 hover:bg-purple-800 text-white rounded-md mt-6").OnClick(v.submit),
 					app.P().Text(v.err).Class("text-red-900"),
 					app.P().Text(v.succ).Class("text-green-900"),

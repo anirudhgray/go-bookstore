@@ -70,7 +70,7 @@ func (l *Login) submit(ctx app.Context, e app.Event) {
 }
 
 func (l *Login) Render() app.UI {
-	return app.Div().Class("bg-gray-400 p-10 min-h-screen flex flex-col").Body(
+	return app.Div().Class("background p-10 min-h-screen flex flex-col").Body(
 		&components.Navbar{},
 		&components.Title{TitleString: "Login"},
 		app.Div().Body(

@@ -1,9 +1,13 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/LECuYE4o)
 
 # Deployed Links
+API: All Main Features Complete
 - API baseurl: http://bookstore.anrdhmshr.tech/api/v1
 - Health Check: http://bookstore.anrdhmshr.tech/api/health
 - API Docs: https://documenter.getpostman.com/view/19697822/2s9Y5Wxifq
+
+Bonus — Frontend: Using Go and WASM (no JS!). Incomplete.
+- http://bookstore.anrdhmshr.tech/
 
 **Test Credentials** to access Deployed Api (you can make your own account as well — will need a valid email):
 ```
@@ -36,6 +40,7 @@
     - [Rough flow for giving users recommendations:](#rough-flow-for-giving-users-recommendations)
     - [Caveats](#caveats)
 - [Where I ran into issues (aka, Gorm):](#where-i-ran-into-issues-aka-gorm)
+- [Frontend](#frontend)
 - [Project Structure](#project-structure)
   - [Explanation](#explanation)
   - [ERD](#erd)
@@ -119,6 +124,13 @@ We keep a record of each user's likes and dislikes (let's base this on review ra
 - Needed to enter associations mode to delete properly, otherwise only the reference would be yeeted.
 - The whole flow of user deletion. The culprit? Gorm, yet again.
 - Overall, gorm seems like a pain. Unfortunately, I also made the poor design choice of having my data layer logic in my business logic controllers — using a "repository pattern" would have made it easier to switch out to something else. Maybe a sql query builder like Squirrel instead of an ORM.
+# Frontend
+Since I was through with the backend tasks, I wanted to try building a frontend for the bookstore while keeping in mind the "Golang only" restriction on the assignment. Which is why I used Go for both the backend and the frontend (compiled to WASM on the frontend). My frontend golang is at [/frontend](/frontend/), and is deployed on the same host as the backend API.
+
+- Frontend Site: http://bookstore.anrdhmshr.tech/
+- Backend API Baseurl: http://bookstore.anrdhmshr.tech/api/v1
+
+This webapp is a single page application.
 # Project Structure
 ```
 .

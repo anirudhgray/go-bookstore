@@ -1,3 +1,24 @@
-.text {
-    color: blue;
+.background {
+    background: linear-gradient(285deg, #9ca3af, #7c3aed66, #7c3aed81, #a1a1aa, #4e46e58d, #9ca3af, #7c3aed81);
+    background-size: 800% 800%;
+
+    -webkit-animation: Background 20s ease infinite;
+    -moz-animation: Background 20s ease infinite;
+    animation: Background 20s ease infinite;
+}
+
+@-webkit-keyframes Background {
+    0%{background-position:47% 0%}
+    50%{background-position:54% 100%}
+    100%{background-position:47% 0%}
+}
+@-moz-keyframes Background {
+    0%{background-position:47% 0%}
+    50%{background-position:54% 100%}
+    100%{background-position:47% 0%}
+}
+@keyframes Background {
+    0%{background-position:47% 0%}
+    50%{background-position:54% 100%}
+    100%{background-position:47% 0%}
 }

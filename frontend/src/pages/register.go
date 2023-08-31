@@ -120,7 +120,7 @@ func (r *Register) resend(ctx app.Context, e app.Event) {
 }
 
 func (r *Register) Render() app.UI {
-	return app.Div().Class("bg-gray-400 p-10 min-h-screen flex flex-col").Body(
+	return app.Div().Class("background p-10 min-h-screen flex flex-col").Body(
 		&components.Navbar{},
 		&components.Title{TitleString: "Register"},
 		app.Div().Body(
