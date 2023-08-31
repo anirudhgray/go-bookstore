@@ -32,8 +32,8 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     volumes:
-      - ./frontend/build:/app/build  # Mount the build directory to the container
-    command: sh -c "GOARCH=wasm GOOS=js go build -o web/app.wasm && GOARCH=wasm GOOS=js go build -o build/web/app.wasm && go build -o bin/frontend && ./bin/frontend"
+      - ./frontend:/app  # Mount the build directory to the container
+    command: sh -c "GOARCH=wasm GOOS=js go build -o web/app.wasm && go build -o frontend && ./frontend"
 
   nginx:
     build: "./nginx"
@@ -42,7 +42,7 @@ services:
     depends_on:
       - server
     volumes:
-      - ./frontend/build:/usr/share/nginx/html/frontend
+      - ./frontend:/usr/share/nginx/html/frontend
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
 
 volumes:

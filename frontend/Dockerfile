@@ -11,8 +11,7 @@ RUN echo $CACHEBUST
 
 # Build the frontend binary and WebAssembly
 RUN GOARCH=wasm GOOS=js go build -o web/app.wasm
-RUN GOARCH=wasm GOOS=js go build -o build/web/app.wasm
-RUN go build -o bin/frontend
+RUN go build
 
 # Run the built frontend binary (this will not be the final use)
-CMD ["./bin/frontend"]
+CMD ["./frontend"]

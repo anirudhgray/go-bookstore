@@ -17,7 +17,10 @@ type hello struct {
 // The Render method is where the component appearance is defined. Here, a
 // "Hello World!" is displayed as a heading.
 func (h *hello) Render() app.UI {
-	return app.H1().Text("Hello World! Nice. Huh. Mm. Coolio.")
+	return app.Div().Body(
+		app.H1().Text("Hello World! Mm. Coolio. NEEEEATO.").Class("text"),
+		&hello2{},
+	)
 }
 
 type hello2 struct {
@@ -54,13 +57,14 @@ func main() {
 	// instructions.
 	app.RunWhenOnBrowser()
 
-	err := app.GenerateStaticWebsite("./build", &app.Handler{
+	h := app.Handler{
 		Name:        "Hello",
 		Description: "An Hello World! example",
-	})
-
-	if err != nil {
-		log.Fatal(err)
+		Resources:   app.LocalDir("/"),
+		Styles: []string{
+			"/web/styles.css",
+			"https://cdn.tailwindcss.com",
+		},
 	}
 
 	// Finally, launching the server that serves the app is done by using the Go
@@ -69,15 +73,15 @@ func main() {
 	// The Handler is an HTTP handler that serves the client and all its
 	// required resources to make it work into a web browser. Here it is
 	// configured to handle requests with a path that starts with "/".
-	http.Handle("/", &app.Handler{
-		Name:        "Hello",
-		Description: "An Hello World! example",
-	})
+	http.Handle("/", &h)
 
-	http.Handle("/nice", &app.Handler{
-		Name:        "Hello2",
-		Description: "An Hello World! example",
-	})
+	http.Handle("/nice", &h)
+
+	err := app.GenerateStaticWebsite(".", &h)
+
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if err := http.ListenAndServe(":8001", nil); err != nil {
 		log.Fatal(err)
