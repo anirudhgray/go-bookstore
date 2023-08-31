@@ -33,7 +33,7 @@ type LoginInput struct {
 func Register(c *gin.Context) {
 	var input RegisterInput
 
-	if err := c.ShouldBind(&input); err != nil {
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -175,7 +175,7 @@ func Login(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		logger.Errorf("login: %v", err.Error())
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Email and Password required."})
 		return
 	}
 

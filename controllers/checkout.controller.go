@@ -80,7 +80,7 @@ func BuyCredits(c *gin.Context) {
 
 	var input BuyCreditsInput
 
-	if err := c.ShouldBind(&input); err != nil {
+	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
