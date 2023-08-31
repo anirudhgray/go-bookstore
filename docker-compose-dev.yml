@@ -41,6 +41,14 @@ services:
       - .:/app
       - app_logs:/app_logs
     restart: always
+
+  frontend-builder:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend/build:/app/build  # Mount the build directory to the container
+    command: sh -c "GOARCH=wasm GOOS=js go build -o web/app.wasm && GOARCH=wasm GOOS=js go build -o build/web/app.wasm && go build -o bin/frontend && ./bin/frontend"
   
   nginx:
     build: "./nginx"
