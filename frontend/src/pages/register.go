@@ -20,6 +20,8 @@ type Register struct {
 
 	err  string
 	succ string
+
+	loading bool
 }
 
 func (r *Register) OnMount(ctx app.Context) {
@@ -33,37 +35,88 @@ func (r *Register) OnMount(ctx app.Context) {
 func (r *Register) submit(ctx app.Context, e app.Event) {
 	r.err = ""
 	r.succ = ""
+	r.loading = true
 
 	e.PreventDefault()
 	values := map[string]string{"email": r.email, "password": r.password, "name": r.name}
 	jsonData, err := json.Marshal(values)
 	if err != nil {
 		r.err = err.Error()
+		r.loading = false
 		return
 	}
 	req, err := http.NewRequest("POST", "/api/v1/auth/register", bytes.NewBuffer(jsonData))
 	if err != nil {
 		r.err = err.Error()
+		r.loading = false
 		return
 	}
 	client := &http.Client{}
 	res, err := client.Do(req)
 	if err != nil {
 		r.err = err.Error()
+		r.loading = false
 		return
 	}
 	defer res.Body.Close()
 	responseBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		r.err = err.Error()
+		r.loading = false
 		return
 	}
 	if res.StatusCode >= 400 {
 		r.err = string(responseBody)
+		r.loading = false
 		return
 	}
 	r.err = ""
 	r.succ = string(responseBody)
+	r.loading = false
+}
+
+func (r *Register) resend(ctx app.Context, e app.Event) {
+	r.err = ""
+	r.succ = ""
+	r.loading = true
+
+	e.PreventDefault()
+
+	email := r.email
+
+	req, err := http.NewRequest("GET", "/api/v1/auth/request-verification", nil)
+	if err != nil {
+		r.err = err.Error()
+		r.loading = false
+		return
+	}
+
+	q := req.URL.Query()
+	q.Add("email", email)
+	req.URL.RawQuery = q.Encode()
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		r.err = err.Error()
+		r.loading = false
+		return
+	}
+	defer res.Body.Close()
+	responseBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		r.err = err.Error()
+		r.loading = false
+		return
+	}
+	if res.StatusCode >= 400 {
+		r.err = string(responseBody)
+		r.loading = false
+		return
+	}
+	r.err = ""
+	r.succ = string(responseBody)
+	r.loading = false
 }
 
 func (r *Register) Render() app.UI {
@@ -81,16 +134,16 @@ func (r *Register) Render() app.UI {
 					app.Input().ID("password").Class("w-full mb-3 py-1 px-2 rounded-md").Value(r.password).Type("password").Placeholder("securePwd!0").OnChange(r.ValueTo(&r.password)),
 					app.Label().For("repeatpassword").Text("Repeat Password"),
 					app.Input().ID("repeatpassword").Class("w-full mb-3 py-1 px-2 rounded-md").Value(r.confirmPassword).Type("password").Placeholder("securePwd!0").OnChange(r.ValueTo(&r.confirmPassword)),
-					app.Button().Text("Register").Class("px-3 py-2 bg-purple-500 hover:bg-purple-800 text-white rounded-md mt-6").OnClick(r.submit),
+					app.Button().Disabled(r.loading).Text("Register").Class("px-3 py-2 bg-purple-500 hover:bg-purple-800 text-white rounded-md mt-6").OnClick(r.submit),
 					app.P().Text(r.err).Class("text-red-900"),
 					app.P().Text(r.succ).Class("text-green-900"),
+					app.If(r.succ != "", app.P().Text("Resend verification mail.").Class("font-bold text-purple-600 hover:text-purple-800").OnClick(r.resend)),
 
 					app.Span().Body(
 						app.P().Text("Have an existing account?"),
 						app.A().Text("Log in.").Href("/login").Class("font-bold text-purple-600 hover:text-purple-800"),
 					).Class("flex gap-1 mt-4"),
 				),
-				// app.P().Text("Nice").Class("md:col-span-1 col-span-2"),
 			),
 		).Class("max-w-[80rem] xl:mx-auto"),
 		&components.Footer{},
