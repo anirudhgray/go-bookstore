@@ -91,7 +91,7 @@ func SendRegistrationMail(subject string, content string, toEmail string, userID
 	otp := ""
 	if newUser {
 		otp = GenerateOTP(6)
-		content += "http://0.0.0.0:8000/v1/auth/verify?email=" + toEmail + "&otp=" + otp
+		content += "http://bookstore.anrdhmshr.tech/verify?email=" + toEmail + "&otp=" + otp
 	}
 
 	err := GenericSendMail(subject, content, toEmail, userName)
@@ -113,7 +113,7 @@ func SendDeletionMail(toEmail string, userID uint, userName string) {
 	otp := ""
 	otp = GenerateOTP(6)
 	confirmationURL := ""
-	confirmationURL += "http://0.0.0.0:8000/v1/auth/delete-account?email=" + toEmail + "&otp=" + otp
+	confirmationURL += "http://bookstore.anrdhmshr.tech/delete-account?email=" + toEmail + "&otp=" + otp
 	content := "A request for the deletion of the bookstore account associated with your user has been made. If this was not you, please change your password. Otherwise, click on this link to confirm account deletion: " + confirmationURL + " . This link will be active for 3 minutes."
 	subject := "Request for account deletion."
 
@@ -131,7 +131,7 @@ func SendForgotPasswordMail(toEmail string, userID uint, userName string) {
 	otp := ""
 	otp = GenerateOTP(6)
 	verificationURL := ""
-	verificationURL += "http://0.0.0.0:8000/v1/auth/set-forgotten-password?email=" + toEmail + "&otp=" + otp
+	verificationURL += "http://bookstore.anrdhmshr.tech/set-forgotten-password?email=" + toEmail + "&otp=" + otp
 	content := "A forgot password request was made for the email associated with your account. If this was not you, feel free to ignore this email. Otherwise, click on this link to post your new password: " + verificationURL + " . This link will be active for 3 minutes."
 	subject := "Forgot Password."
 
