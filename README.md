@@ -39,8 +39,8 @@ Bonus — Frontend: Using Go and WASM (no JS!). Incomplete.
 - [Recommendation Engine](#recommendation-engine)
     - [Rough flow for giving users recommendations:](#rough-flow-for-giving-users-recommendations)
     - [Caveats](#caveats)
-- [Where I ran into issues (aka, Gorm):](#where-i-ran-into-issues-aka-gorm)
 - [Frontend](#frontend)
+- [Where I ran into issues (aka, 90% Gorm):](#where-i-ran-into-issues-aka-90-gorm)
 - [Project Structure](#project-structure)
   - [Explanation](#explanation)
   - [ERD](#erd)
@@ -119,11 +119,6 @@ We keep a record of each user's likes and dislikes (let's base this on review ra
 - Currently doing calculation in-memory. Like, user wants reccs => I do all of the above and return some reccs. Maybe a better way to handle this would be to use something like Redis which apparently has nice features to work with sets, and generate reccs periodically. 
 - Also, a major issue with collaborative filtering is that of "cold start" — since this method relies on other similar users, what do you do for the first few users? And you can't get any recommendations until you make a few likes/dislikes of your own, and books with no reviews cannot be recommended to any users. In such cases a hybrid approach involving this + a content based engine would be helpful.
 - I am currently doing a basic like/dislike thing. However, since my ratings are on a scale of 1-5 I should make use of that (by giving more weight to a 5 than a 4, instead of treating both as equal likes).
-# Where I ran into issues (aka, Gorm):
-- Did not initially realise that gorm's auto-migrations do not, in fact, drop unused columns. While it does make sense as a default so that we don't lose data... well, anyway, spent some time trying to debug why my many2many join table had an unrelated column in it. Ended up dropping the table and then running migrations, will make sure to use my own migration scripts or a more full fledged library like goose.
-- Needed to enter associations mode to delete properly, otherwise only the reference would be yeeted.
-- The whole flow of user deletion. The culprit? Gorm, yet again.
-- Overall, gorm seems like a pain. Unfortunately, I also made the poor design choice of having my data layer logic in my business logic controllers — using a "repository pattern" would have made it easier to switch out to something else. Maybe a sql query builder like Squirrel instead of an ORM.
 # Frontend
 Since I was through with the backend tasks, I wanted to try building a frontend for the bookstore while keeping in mind the "Golang only" restriction on the assignment. Which is why I used Go for both the backend and the frontend (compiled to WASM on the frontend). My frontend golang is at [/frontend](/frontend/), and is deployed on the same host as the backend API.
 
@@ -131,6 +126,12 @@ Since I was through with the backend tasks, I wanted to try building a frontend 
 - Backend API Baseurl: http://bookstore.anrdhmshr.tech/api/v1
 
 This webapp is a single page application.
+# Where I ran into issues (aka, 90% Gorm):
+- Did not initially realise that gorm's auto-migrations do not, in fact, drop unused columns. While it does make sense as a default so that we don't lose data... well, anyway, spent some time trying to debug why my many2many join table had an unrelated column in it. Ended up dropping the table and then running migrations, will make sure to use my own migration scripts or a more full fledged library like goose.
+- Needed to enter associations mode to delete properly, otherwise only the reference would be yeeted.
+- The whole flow of user deletion. The culprit? Gorm, yet again.
+- Overall, gorm seems like a pain. Unfortunately, I also made the poor design choice of having my data layer logic in my business logic controllers — using a "repository pattern" would have made it easier to switch out to something else. Maybe a sql query builder like Squirrel instead of an ORM.
+- On the frontend: Generated wasm sizes are pretty massive. Some suggestions are to separate out the http package since it's pretty big, or to use some sort of compression middleware.
 # Project Structure
 ```
 .

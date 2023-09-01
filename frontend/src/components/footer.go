@@ -7,5 +7,8 @@ type Footer struct {
 }
 
 func (f *Footer) Render() app.UI {
-	return app.P().Text("Made by Anirudh Mishra").Class("mt-auto pt-6 text-center")
+	return app.Div().Class("mt-auto glass py-3 px-4 max-w-[80rem] w-full mx-auto").Body(
+		app.P().Text("Made by Anirudh Mishra").Class("text-center"),
+		app.P().Text("API at /api/v1").Class("mt-auto text-center"),
+	)
 }

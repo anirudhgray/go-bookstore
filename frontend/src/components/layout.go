@@ -24,7 +24,7 @@ func (l *Layout) Title(v string) *Layout {
 }
 
 func (l *Layout) Render() app.UI {
-	return app.Div().Class("background p-10 min-h-screen flex flex-col").Body(
+	return app.Div().Class("background md:p-10 p-5 min-h-screen flex flex-col").Body(
 		&Navbar{},
 		app.H2().Text(l.title).Class("text-4xl font-bold text-purple-900 mt-6 mb-6 xl:text-center"),
 		app.Div().Body(

@@ -74,7 +74,7 @@ func (v *Verify) submit(ctx app.Context, e app.Event) {
 }
 
 func (v *Verify) Render() app.UI {
-	return app.Div().Class("background p-10 min-h-screen flex flex-col").Body(
+	return app.Div().Class("background md:p-10 p-5 min-h-screen flex flex-col").Body(
 		&components.Navbar{},
 		&components.Title{TitleString: "Account Verification"},
 		app.Div().Body(

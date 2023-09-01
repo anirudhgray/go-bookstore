@@ -33,8 +33,8 @@ func (n *Navbar) Render() app.UI {
 			app.P().Text("Built using Golang and WASM"),
 		),
 		app.Div().Body(
-			app.If(n.auth, app.P().Text("LOGOUT").OnClick(n.logout).Class("cursor-pointer hover:font-bold")),
+			app.If(n.auth, app.Span().OnClick(n.logout).Class("bi bi-box-arrow-right cursor-pointer hover:font-bold text-4xl")),
 			app.A().Class("bi bi-github text-4xl").Href("https://github.com/BalkanID-University/vit-2025-summer-engineering-internship-task-anirudhgray"),
 		).Class("flex gap-5 items-center"),
-	).Class("flex justify-between max-w-[80rem] w-full mx-auto")
+	).Class("flex justify-between max-w-[80rem] w-full mx-auto glass py-3 px-4")
 }

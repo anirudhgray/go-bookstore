@@ -84,7 +84,7 @@ func (s *SetAfterForgot) submit(ctx app.Context, e app.Event) {
 }
 
 func (s *SetAfterForgot) Render() app.UI {
-	return app.Div().Class("background p-10 min-h-screen flex flex-col").Body(
+	return app.Div().Class("background md:p-10 p-5 min-h-screen flex flex-col").Body(
 		&components.Navbar{},
 		&components.Title{TitleString: "Set New Password"},
 		app.Div().Body(

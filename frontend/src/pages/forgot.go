@@ -72,7 +72,7 @@ func (f *Forgot) submit(ctx app.Context, e app.Event) {
 }
 
 func (f *Forgot) Render() app.UI {
-	return app.Div().Class("background p-10 min-h-screen flex flex-col").Body(
+	return app.Div().Class("background md:p-10 p-5 min-h-screen flex flex-col").Body(
 		&components.Navbar{},
 		&components.Title{TitleString: "Forgot Password"},
 		app.Div().Body(
@@ -83,6 +83,10 @@ func (f *Forgot) Render() app.UI {
 					app.Button().Disabled(f.loading).Text("Send OTP").Class("px-3 py-2 bg-purple-500 hover:bg-purple-800 text-white rounded-md mt-6").OnClick(f.submit),
 					app.P().Text(f.err).Class("text-red-900"),
 					app.P().Text(f.succ).Class("text-green-900"),
+					app.Span().Body(
+						app.P().Text("Go to"),
+						app.A().Text("Login.").Href("/login").Class("font-bold text-purple-600 hover:text-purple-800"),
+					).Class("flex gap-1 mt-4"),
 				),
 			),
 		).Class("max-w-[80rem] xl:mx-auto"),
