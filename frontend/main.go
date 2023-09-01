@@ -48,6 +48,15 @@ func main() {
 		},
 		Scripts: []string{
 			"https://cdn.tailwindcss.com",
+			"https://unpkg.com/@lottiefiles/lottie-player@1/dist/lottie-player.js",
+			"https://unpkg.com/@lottiefiles/lottie-interactivity@latest/dist/lottie-interactivity.min.js",
+		},
+		RawHeaders: []string{
+			`<script>
+			tailwind.config = {
+				darkMode: 'class',
+			  }
+			</script>`,
 		},
 	}
 

@@ -21,8 +21,8 @@ func (h *Landing) Render() app.UI {
 		app.Img().Alt("20-minute-adventure").Src("/web/images/rickandmorty.jpeg").Class("mt-6 md:w-2/3 md:max-w-[40rem] mx-auto w-full"),
 		app.Span().Body(
 			app.P().Text("Let's go, in and out. 20 minute adventure.").Class("italic text-sm"),
-			app.P().Text("- me, looking cheerfully at go and wasm earlier.").Class("text-sm"),
+			app.P().Text("- me, looking cheerfully at go and wasm earlier. Also, me picking up a book to read.").Class("text-sm"),
 		).Class("text-center mb-6"),
-		app.A().Text("Enter Bookstore").Class("px-3 py-2 bg-purple-500 hover:bg-purple-800 text-white rounded-md max-w-full block w-[20rem] text-center mt-6 mx-auto").Href("/login"),
+		app.A().Text("Enter Bookstore").Class("px-3 py-2 bg-purple-500 hover:bg-purple-800 dark:bg-purple-600 dark:hover:bg-purple-400 text-white rounded-md max-w-full block w-[20rem] text-center mt-6 mx-auto").Href("/login"),
 	)
 }

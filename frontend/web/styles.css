@@ -7,6 +7,15 @@
     animation: Background 20s ease infinite;
 }
 
+.dark .background {
+    background: linear-gradient(285deg, #1a0343e6,#231043, #4b09a8d2,#1a0343e6, #231043e1);
+    background-size: 800% 800%;
+
+    -webkit-animation: Background 20s ease infinite;
+    -moz-animation: Background 20s ease infinite;
+    animation: Background 20s ease infinite;
+}
+
 @-webkit-keyframes Background {
     0%{background-position:47% 0%}
     50%{background-position:54% 100%}
@@ -31,4 +40,8 @@
     backdrop-filter: blur(6.1px);
     -webkit-backdrop-filter: blur(6.1px);
     border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.dark p, .dark label {
+    color: #f3e8ff;
 }

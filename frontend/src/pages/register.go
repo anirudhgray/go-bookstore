@@ -134,14 +134,14 @@ func (r *Register) Render() app.UI {
 					app.Input().ID("password").Class("w-full mb-3 py-1 px-2 rounded-md").Value(r.password).Type("password").Placeholder("securePwd!0").OnChange(r.ValueTo(&r.password)),
 					app.Label().For("repeatpassword").Text("Repeat Password"),
 					app.Input().ID("repeatpassword").Class("w-full mb-3 py-1 px-2 rounded-md").Value(r.confirmPassword).Type("password").Placeholder("securePwd!0").OnChange(r.ValueTo(&r.confirmPassword)),
-					app.Button().Disabled(r.loading).Text("Register").Class("px-3 py-2 bg-purple-500 hover:bg-purple-800 text-white rounded-md mt-6").OnClick(r.submit),
+					app.Button().Disabled(r.loading).Text("Register").Class("px-3 py-2 bg-purple-500 hover:bg-purple-800 text-white rounded-md mt-6 dark:bg-purple-600 dark:hover:bg-purple-400").OnClick(r.submit),
 					app.P().Text(r.err).Class("text-red-900"),
 					app.P().Text(r.succ).Class("text-green-900"),
-					app.If(r.succ != "", app.P().Text("Resend verification mail.").Class("font-bold text-purple-600 hover:text-purple-800").OnClick(r.resend)),
+					app.If(r.succ != "", app.P().Text("Resend verification mail.").Class("font-bold text-purple-600 hover:text-purple-800 dark:text-purple-500 dark:hover:text-purple-300").OnClick(r.resend)),
 
 					app.Span().Body(
 						app.P().Text("Have an existing account?"),
-						app.A().Text("Log in.").Href("/login").Class("font-bold text-purple-600 hover:text-purple-800"),
+						app.A().Text("Log in.").Href("/login").Class("font-bold text-purple-600 hover:text-purple-800 dark:text-purple-500 dark:hover:text-purple-300"),
 					).Class("flex gap-1 mt-4"),
 				),
 			),
