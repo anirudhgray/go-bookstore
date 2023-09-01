@@ -40,6 +40,7 @@ Bonus — Frontend: Using Go and WASM (no JS!). Incomplete.
     - [Rough flow for giving users recommendations:](#rough-flow-for-giving-users-recommendations)
     - [Caveats](#caveats)
 - [Frontend](#frontend)
+    - [Screenshots](#screenshots)
 - [Where I ran into issues (aka, 90% Gorm):](#where-i-ran-into-issues-aka-90-gorm)
 - [Project Structure](#project-structure)
   - [Explanation](#explanation)
@@ -49,9 +50,9 @@ Bonus — Frontend: Using Go and WASM (no JS!). Incomplete.
 2. Make sure you have docker/docker desktop installed, and a docker daemon running.
 3. Rename `sample.env` to `.env`, and set JWT signing secret (API_SECRET) with `openssl rand -hex 32`.
 4. For MAILTRAP_API_TOKEN, obtain a free api token from https://mailtrap.io/, or run the app without it (confirmation mails, etc, will not be sent in that case).
-5. `make dev`
-6. App will be served at http://0.0.0.0:8000/ by default. Check http://0.0.0.0:8000/health to see if everything is OK on serverside.
-7. PG Admin will be served at http://0.0.0.0:5050/browser (only in development). Hostname: `postgres_db`, Username and Password as in your env config.
+5. `make production`
+6. Frontend will be served at http://0.0.0.0/ by default. Check http://0.0.0.0/api/health to see if everything is OK on serverside. API baseurl: http://0.0.0.0/api/v1.
+7. (Not on production. PG Admin only spinned up on dev) PG Admin will be served at http://0.0.0.0:5050/browser (only in development). Hostname: `postgres_db`, Username and Password as in your env config.
 8. API Docs at: https://documenter.getpostman.com/view/19697822/2s9Y5Wxifq
    
 # Features
@@ -125,7 +126,19 @@ Since I was through with the backend tasks, I wanted to try building a frontend 
 - Frontend Site: http://bookstore.anrdhmshr.tech/
 - Backend API Baseurl: http://bookstore.anrdhmshr.tech/api/v1
 
-This webapp is a single page application.
+This webapp is a single page application. It is very limited: only the auth flows, and basic catalog viewing is implemented on the frontend. However, all routes and features are implemented in the backend API.
+### Screenshots
+- Catalog View (after logging in)
+
+![frontend-catalog](/readme-media/frontend-catalog.png)
+
+- Mobile View (landing page)
+
+![frontend-mobile](/readme-media/frontend-mobile.png)
+
+- Login View (dark mode)
+
+![frontend-dark](/readme-media/frontend-dark.png)
 # Where I ran into issues (aka, 90% Gorm):
 - Did not initially realise that gorm's auto-migrations do not, in fact, drop unused columns. While it does make sense as a default so that we don't lose data... well, anyway, spent some time trying to debug why my many2many join table had an unrelated column in it. Ended up dropping the table and then running migrations, will make sure to use my own migration scripts or a more full fledged library like goose.
 - Needed to enter associations mode to delete properly, otherwise only the reference would be yeeted.
@@ -209,4 +222,4 @@ This webapp is a single page application.
 ## ERD
 > **Note:** This does not show 1:1 relations properly (shown as 1:N). Will update.
 
-![erd](erd.png)
+![erd](/readme-media/erd.png)

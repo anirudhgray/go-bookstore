@@ -1,8 +1,6 @@
 package components
 
 import (
-	"fmt"
-
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 )
 
@@ -24,7 +22,6 @@ func (n *Navbar) OnMount(ctx app.Context) {
 	var theme string
 	ctx.LocalStorage().Get("dark", &theme)
 	n.dark = theme
-	fmt.Println(n.dark, theme)
 }
 
 func (n *Navbar) logout(ctx app.Context, e app.Event) {

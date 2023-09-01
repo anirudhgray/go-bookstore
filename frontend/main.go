@@ -45,8 +45,11 @@ func main() {
 		Styles: []string{
 			"/web/styles.css",
 			"https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css",
+			"https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.css",
 		},
 		Scripts: []string{
+			"https://cdn.jsdelivr.net/npm/@yaireo/tagify",
+			"https://cdn.jsdelivr.net/npm/@yaireo/tagify/dist/tagify.polyfills.min.js",
 			"https://cdn.tailwindcss.com",
 			"https://unpkg.com/@lottiefiles/lottie-player@1/dist/lottie-player.js",
 			"https://unpkg.com/@lottiefiles/lottie-interactivity@latest/dist/lottie-interactivity.min.js",

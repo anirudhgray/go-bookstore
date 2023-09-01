@@ -17,7 +17,7 @@ type Landing struct {
 func (h *Landing) Render() app.UI {
 	return components.NewPage().Title("Welcome").Children(
 		app.P().Text("The backend API is COMPLETE and you can see the docs in the github readme (base url is at /api). Backend is written in Golang (using Gin and Gorm, though more on why the latter was a bad idea later), with Postgres as a DB."),
-		app.P().Text("The frontend is also pretty cool, since instead of a JS framework, I'm using Go compiled to WebAssembly. However, at the time of this writing, the frontend consists of basically what you see in front of you. Fun exercise nonetheless.").Class("mt-2 text-justify"),
+		app.P().Text("The frontend is also pretty cool, since instead of a JS framework, I'm using Go compiled to WebAssembly. Fun exercise. That said, the frontend is limited in its functionality (but as said above, the backend does have all features, which you can test via postman docs).").Class("mt-2 text-justify"),
 		app.Img().Alt("20-minute-adventure").Src("/web/images/rickandmorty.jpeg").Class("mt-6 md:w-2/3 md:max-w-[40rem] mx-auto w-full"),
 		app.Span().Body(
 			app.P().Text("Let's go, in and out. 20 minute adventure.").Class("italic text-sm"),
