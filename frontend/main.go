@@ -38,8 +38,9 @@ func main() {
 	app.RunWhenOnBrowser()
 
 	h := app.Handler{
-		Name:        "Hello",
-		Description: "An Hello World! example",
+		Name:        "Secure Bookstore",
+		ShortName:   "SB",
+		Description: "A secure bookstore fullstack app built using Go and WASM",
 		Resources:   app.LocalDir("/"),
 		Styles: []string{
 			"/web/styles.css",
@@ -58,7 +59,7 @@ func main() {
 	// configured to handle requests with a path that starts with "/".
 	http.Handle("/", &h)
 
-	http.Handle("/nice", &h)
+	// http.Handle("/nice", &h)
 
 	err := app.GenerateStaticWebsite(".", &h)
 
