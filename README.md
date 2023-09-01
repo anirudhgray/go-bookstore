@@ -1,12 +1,12 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/LECuYE4o)
 
 # Deployed Links
-API: All Main Features Complete
+Backend: All Main Features Complete
 - API baseurl: http://bookstore.anrdhmshr.tech/api/v1
 - Health Check: http://bookstore.anrdhmshr.tech/api/health
 - API Docs: https://documenter.getpostman.com/view/19697822/2s9Y5Wxifq
 
-Bonus — Frontend: Using Go and WASM (no JS!). Incomplete.
+Bonus — Frontend: Using Go and WASM. Incomplete (landing, login, signup, forgotpwd, basic catalog).
 - http://bookstore.anrdhmshr.tech/
 
 **Test Credentials** to access Deployed Api (you can make your own account as well — will need a valid email):
@@ -50,7 +50,7 @@ Bonus — Frontend: Using Go and WASM (no JS!). Incomplete.
 2. Make sure you have docker/docker desktop installed, and a docker daemon running.
 3. Rename `sample.env` to `.env`, and set JWT signing secret (API_SECRET) with `openssl rand -hex 32`.
 4. For MAILTRAP_API_TOKEN, obtain a free api token from https://mailtrap.io/, or run the app without it (confirmation mails, etc, will not be sent in that case).
-5. `make production`
+5. `make dev` 
 6. Frontend will be served at http://0.0.0.0/ by default. Check http://0.0.0.0/api/health to see if everything is OK on serverside. API baseurl: http://0.0.0.0/api/v1.
 7. (Not on production. PG Admin only spinned up on dev) PG Admin will be served at http://0.0.0.0:5050/browser (only in development). Hostname: `postgres_db`, Username and Password as in your env config.
 8. API Docs at: https://documenter.getpostman.com/view/19697822/2s9Y5Wxifq
@@ -85,7 +85,7 @@ Users need credits to buy books. They can purchase credits (a transaction record
 ### 12. User Library:
 Library of books bought by a user. The user can download any of them as many times as they want.
 ### 13. Reviews:
-Users can only review a book that they have bought (ie, which is in their library). Reviews have a comment, and a rating (which is used to calc avg rating for the book, and for generating recommendations).
+Users can only review a book that they have bought (ie, which is in their library). Reviews have a comment, and a rating (which is used to calc avg rating for the book, and for **generating recommendations**).
 ### 14. Logging with Retention (Rotating Log)
 Currently logging to a local rotating logfile. Logs are persisted on prod by mounting a docker volume for them (app_logs). To access (will copy logs to ./logs dir on host system):
 `docker cp <SERVER_CONTAINER_ID>:/app_logs ./logs`
@@ -121,12 +121,12 @@ We keep a record of each user's likes and dislikes (let's base this on review ra
 - Also, a major issue with collaborative filtering is that of "cold start" — since this method relies on other similar users, what do you do for the first few users? And you can't get any recommendations until you make a few likes/dislikes of your own, and books with no reviews cannot be recommended to any users. In such cases a hybrid approach involving this + a content based engine would be helpful.
 - I am currently doing a basic like/dislike thing. However, since my ratings are on a scale of 1-5 I should make use of that (by giving more weight to a 5 than a 4, instead of treating both as equal likes).
 # Frontend
-Since I was through with the backend tasks, I wanted to try building a frontend for the bookstore while keeping in mind the "Golang only" restriction on the assignment. Which is why I used Go for both the backend and the frontend (compiled to WASM on the frontend). My frontend golang is at [/frontend](/frontend/), and is deployed on the same host as the backend API.
+Since I was through with the backend tasks, I wanted to try building a frontend for the bookstore while keeping in mind the "Golang only" restriction on the assignment. Which is why I used Go for both the backend and the frontend (compiled to WASM on the frontend). My frontend golang is at [/frontend](/frontend/), and is deployed on the same host as the backend API. This webapp is a single page application.
 
 - Frontend Site: http://bookstore.anrdhmshr.tech/
 - Backend API Baseurl: http://bookstore.anrdhmshr.tech/api/v1
 
-This webapp is a single page application. It is very limited: only the auth flows, and basic catalog viewing is implemented on the frontend. However, all routes and features are implemented in the backend API.
+> It is very limited: only the auth flows, and basic catalog viewing is implemented on the frontend. However, all routes and features are implemented in the backend API.
 ### Screenshots
 - Catalog View (after logging in)
 
@@ -171,17 +171,46 @@ This webapp is a single page application. It is very limited: only the auth flow
 │   ├── docs.go
 │   ├── swagger.json
 │   └── swagger.yaml
-├── erd.png
+├── frontend
+│   ├── Dockerfile
+│   ├── go.mod
+│   ├── go.sum
+│   ├── main.go
+│   ├── makefile
+│   ├── src
+│   │   ├── components
+│   │   │   ├── footer.go
+│   │   │   ├── layout.go
+│   │   │   ├── navbar.go
+│   │   │   └── title.go
+│   │   └── pages
+│   │       ├── catalog.go
+│   │       ├── forgot.go
+│   │       ├── landing.go
+│   │       ├── login.go
+│   │       ├── register.go
+│   │       ├── setAfterForgot.go
+│   │       └── verify.go
+│   └── web
+│       ├── app.wasm
+│       ├── images
+│       │   └── rickandmorty.jpeg
+│       ├── js
+│       │   └── themeToggle.js
+│       ├── lottie
+│       │   ├── themeToggle.json
+│       │   └── themeToggleInverse.json
+│       └── styles.css
 ├── go.mod
 ├── go.sum
+├── go.work
+├── go.work.sum
 ├── infra
 │   ├── database
 │   │   └── database.go
 │   └── logger
 │       └── logger.go
 ├── main.go
-├── migrations
-│   └── migration.go
 ├── models
 │   ├── book.model.go
 │   ├── cart.model.go
