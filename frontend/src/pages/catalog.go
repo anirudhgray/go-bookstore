@@ -111,7 +111,7 @@ func (c *Catalog) Render() app.UI {
 		&components.Title{TitleString: "Catalog"},
 		app.Div().Body(
 			app.Form().Class("w-full relative mb-6 flex flex-col gap-4").Body(
-				app.Input().ID("catalogSearch").Class("resize-none w-full py-1 px-2 rounded-md bg-white sm:pr-20").OnChange(c.ValueTo(&c.search)).Placeholder("Search for books!").Value(c.search),
+				app.Input().ID("catalogSearch").Class("resize-none w-full py-[0.65rem] px-3 rounded-md bg-white sm:pr-20").OnChange(c.ValueTo(&c.search)).Placeholder("Search for books!").Value(c.search),
 				app.Button().Type("submit").Class("absolute sm:block hidden right-0 top-0 px-4 bi bi-search py-[0.65rem] bg-purple-500 hover:bg-purple-800 text-white rounded-md dark:bg-purple-600 dark:hover:bg-purple-400"),
 				app.Button().Text("Search").Type("submit").Class("block sm:hidden px-4 bi bi-search py-3 bg-purple-500 hover:bg-purple-800 text-white rounded-md dark:bg-purple-600 dark:hover:bg-purple-400 ml-auto"),
 			).OnSubmit(c.submitSearch),

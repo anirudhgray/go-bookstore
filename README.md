@@ -9,6 +9,8 @@ Backend: All Main Features Complete
 Bonus — Frontend: Using Go and WASM. Incomplete (landing, login, signup, forgotpwd, basic catalog).
 - http://bookstore.anrdhmshr.tech/
 
+Demo Video: https://youtu.be/F_GDIHgObvU
+
 **Test Credentials** to access Deployed Api (you can make your own account as well — will need a valid email):
 ```
 {
@@ -34,7 +36,7 @@ Bonus — Frontend: Using Go and WASM. Incomplete (landing, login, signup, forgo
     - [12. User Library:](#12-user-library)
     - [13. Reviews:](#13-reviews)
     - [14. Logging with Retention (Rotating Log)](#14-logging-with-retention-rotating-log)
-    - [15. Reverse Proxy on prod using nginx.](#15-reverse-proxy-on-prod-using-nginx)
+    - [15. Reverse Proxy using nginx.](#15-reverse-proxy-using-nginx)
     - [16. Security](#16-security)
 - [Recommendation Engine](#recommendation-engine)
     - [Rough flow for giving users recommendations:](#rough-flow-for-giving-users-recommendations)
@@ -54,6 +56,10 @@ Bonus — Frontend: Using Go and WASM. Incomplete (landing, login, signup, forgo
 6. Frontend will be served at http://0.0.0.0/ by default. Check http://0.0.0.0/api/health to see if everything is OK on serverside. API baseurl: http://0.0.0.0/api/v1.
 7. (Not on production. PG Admin only spinned up on dev) PG Admin will be served at http://0.0.0.0:5050/browser (only in development). Hostname: `postgres_db`, Username and Password as in your env config.
 8. API Docs at: https://documenter.getpostman.com/view/19697822/2s9Y5Wxifq
+
+> If you run via postman, make sure to set this in the Tests tab of the login route:
+> `pm.collectionVariables.set("token", pm.response.json().token);`
+> This will automatically set the returned token when you login as a user so you won't need to set it in the collection variables manually.
    
 # Features
 ### 1. Auth/User: 
@@ -89,7 +95,8 @@ Users can only review a book that they have bought (ie, which is in their librar
 ### 14. Logging with Retention (Rotating Log)
 Currently logging to a local rotating logfile. Logs are persisted on prod by mounting a docker volume for them (app_logs). To access (will copy logs to ./logs dir on host system):
 `docker cp <SERVER_CONTAINER_ID>:/app_logs ./logs`
-### 15. Reverse Proxy on prod using nginx.
+### 15. Reverse Proxy using nginx.
+Check out [](/nginx/). Backend at location /api and frontend static files at /.
 ### 16. Security
 I am protecting against attacks like SQLI, and dependency graph revealed no major vulnerabilities with known exploits.
 # Recommendation Engine
